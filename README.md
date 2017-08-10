@@ -30,12 +30,12 @@ ____
 * Horas de práctica: **Dos** (2)
 * Carácter: **Obligatorio**
 * Pre-requisitos: **Estadística para el Análisis Político 1**
-* Profesor: __Dr. Mag. Lic. José Manuel Magallanes, PhD__  ([jmagallanes@pucp.edu.pe](mailto:jmagallanes@pucp.edu.pe))[INICIO](#beginning)
+* Profesor:  [__Dr. José Manuel Magallanes, PhD__](http://www.pucp.edu.pe/profesor/jose-manuel-magallanes/)  ([jmagallanes@pucp.edu.pe](mailto:jmagallanes@pucp.edu.pe))[INICIO](#beginning)
 ____
 <a id='part2'></a>
 ### 2. Sumilla
 
-Es un curso instrumental-metodológico de carácter teórico-práctico donde el alumno aprende a aplicar técnicas descriptivas y predictivas sobre datos multivariantes de origen no experimental con un enfoque computacional. Durante el desarrollo del curso, el alumno debe perfeccionar su capacidad analítica, y propósitiva con coherencia metodológica y ética.
+Es un curso instrumental-metodológico de carácter teórico-práctico donde el alumno aprende a aplicar técnicas descriptivas y predictivas sobre datos multivariantes de origen no experimental con un enfoque computacional. Durante el desarrollo del curso, el alumno debe perfeccionar su capacidad analítica y propósitiva, con coherencia metodológica y ética.
 
 
 [INICIO](#beginning)
@@ -45,7 +45,7 @@ ____
 ### 3. Aporte del curso al perfil de egreso:
 
  
-* Consolida su capacidad de abstracción de problemas complejos mediante en análisis de datos.
+* Consolida su capacidad de abstracción de problemas complejos mediante el análisis de datos.
 * Perfecciona su capacidad de síntesis ante datos multivariantes produciendo reportes comprensibles ante diferentes tipos de audiencias.
 * Eleva su capacidad comparativa y métrica sobre temas de gobierno.
 [INICIO](#beginning)
@@ -56,7 +56,7 @@ ____
 * Sabe decidir qué técnica es más apropiada ante determinada situación de análisis.
 * Sabe organizar sus datos para facilitar el procesos de análisis y presentación.
 * Sabe crear indicadores complejos.
-* Maneja adecuadamente el R y otros programas de análsis estadístico.
+* Maneja adecuadamente el R y otros programas de análisis estadístico y de organización datos.
 
 
 
@@ -69,15 +69,17 @@ ____
 
 La evaluación se realizará de modo continuo a lo largo del semestre académico y considera los siguientes componentes:
 
-**5.1. PROYECTO APLICATIVO (PryAp)**El alumno deberá conseguir un 'cliente' en algun sector del gobierno (subnacional, nacional o internacional), partido político o organismo de la sociedad civil interesada en temas públicos. El alumno debe producir un reporte para el cliente usando adecuadamente los conceptos vistos desde los cursos pre-requisito de este curso. El alumno expone en clase:
+**5.1. PROYECTO APLICATIVO (PryAp)**El alumno deberá conseguir un 'cliente' en algun sector del gobierno (subnacional, nacional o internacional), partido/movimiento político, u organismo de la sociedad civil interesada en temas públicos. El alumno debe producir un reporte para el cliente usando adecuadamente los conceptos vistos desde los cursos pre-requisito de este curso. El alumno expone en clase:
 
 1. La metodología y técnicas utilizadas.
-2. El reporte final entregado
+2. El reporte final entregado al cliente.
 3. Breve discusión sobre el proceso seguido para llevar a cabo el proyecto.
+
+El Profesor tomará en cuenta la opinión del cliente para la nota final.
 
 **5.2. PRACTICAS CALIFICADAS (PrtCa)**
 
-Los alumnos rendirán prácticas calificadas durante el ciclo donde demostrarán su destreza en la identificación de análisis estadísticos pertinentes para la resolución de preguntas de investigación y su habilidad para realizar interpretaciones acertadas que llevarán a una discusión alturada de resultados de investigación. Todas requieren el manejo de los conceptos y el uso del R u otros programas. Cada práctica contiene sólo los elementos vistos en el tema a evaluar.
+Los alumnos rendirán prácticas calificadas durante el ciclo, donde demostrarán su destreza en la identificación de análisis estadísticos pertinentes para la resolución de preguntas de investigación y su habilidad para realizar interpretaciones acertadas que llevarán a una discusión alturada de los resultados de investigación. Todas requieren el manejo de los conceptos y el uso del R u otros programas. Cada práctica contiene sólo los elementos vistos en el tema a evaluar.
 
 
 **5.3. EXAMEN INTEGRAL (ExIn)**
