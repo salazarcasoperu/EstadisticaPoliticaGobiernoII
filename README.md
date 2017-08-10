@@ -231,8 +231,7 @@ ____
  	<td>11</td>
  	<td>23/Oct</td>
  	<td>28/Oct</td>
- 	
- 	<td>Análisis de Eventos históricos. 	</td>
+ 	<td>Análisis de Eventos históricos.</td>
  </tr>
  
  
