@@ -79,28 +79,24 @@ La evaluación se realizará de modo continuo a lo largo del semestre académico
 
 Los alumnos rendirán prácticas calificadas durante el ciclo donde demostrarán su destreza en la identificación de análisis estadísticos pertinentes para la resolución de preguntas de investigación y su habilidad para realizar interpretaciones acertadas que llevarán a una discusión alturada de resultados de investigación. Todas requieren el manejo de los conceptos y el uso del R u otros programas. Cada práctica contiene sólo los elementos vistos en el tema a evaluar.
 
-[INICIO](#beginning)
-<a id='part53'></a>
 
-**5.3. EXAMEN DE MEDIO CICLO (ExMe)**
-El examen de medio ciclo consta de dos partes:
+**5.3. EXAMEN INTEGRAL (ExIn)**
+El examen integral consta de dos partes:
 
 1. Componente teórico: Evalúa el manejo preciso de los conceptos vistos en el curso. Durante esta etapa los alumnos no deben usar notas de clase.
 2. Componente práctico: Evalúa, a diferencia de las practicas calificadas, poder resolver ejercicios que requieran el manejo de diversas técnicas e involucren diferentes etapas. En esta etapa los alumnos pueden utilizar todos los recursos que estimen conveniente.
 
 Cada componente pesa 50%.
 
-[INICIO](#beginning)
-<a id='part54'></a>
 
 **5.4. FORMULA** 
-Nota Final= PryAp + PrtCa + ExMe
+Nota Final= PryAp + PrtCa + ExIn
 
 Donde:
 
 * PryAp otorga 5 puntos
 * PrtCa otorga 5 puntos
-* ExMe otorga 10 puntos[INICIO](#beginning)
+* ExIn otorga 10 puntos[INICIO](#beginning)
 ____
 <a id='part6'></a>
 
@@ -109,13 +105,13 @@ ____
 
 * LIBROS DE CONSULTA 
 
-Imai, K.(2017). Quantitative Social Science: An Introduction. Princeton University Press.
+Imai, Kosuke.(2017). Quantitative Social Science: An Introduction. Princeton University Press.
 
 Magallanes, José Manuel (2012). Tour Guiado por la Estadística Básica. Pontificia Universidad Católica del Peru.
 
 Magallanes, José Manuel (2017). Introduction to Data Science for Social and Policy Research. Cambridge University Press.
 
-Moore, W., D. Siegel (2013). A Mathematics Course for Political and Social Research. Princeton University Press.
+Moore, Will, David Siegel (2013). A Mathematics Course for Political and Social Research. Princeton University Press.
 
 
 
@@ -142,11 +138,10 @@ ____
  	<td>1</td>
  	<td>14/Ago</td>
  	<td>19/Ago</td>
- 	<td rowspan="3">Estadística y Psicología</td>
- 	<td> Psicología Cuantitativa</td>
- 	<td> Revisión del Syllabus. 
- 	<br> Discusión sobre rol de los enfoques cuantitativos en la Psicología.
- 	<br>Proceso de Investigación.</br> 
+ 	<td rowspan="2">Exploración de datos</td>
+ 	<td> Estadística e Investigación</td>
+ 	<td> Revisión del Syllabus (foro on-line). 
+ 	<br> Recolección de Datos.</br> 
  	</td>
  </tr>
  
@@ -158,36 +153,34 @@ ____
  	<td>26/Ago</td>
  	<td>Exploración de Datos y Formulación de Hipótesis</td>
  	<td>Elementos del Análisis Exploratorio de Datos (AED).
- 	<br>Operacionalización de hipótesis a partir del AED.<br>Práctica dirigida sobre uso de SPSS.</br></td>
+ 	<br>Operacionalización de hipótesis a partir del AED.</td>
  </tr>
  
   <tr>
  	<td>3<sup><a href="#fn1" id="ref1">1</a></sup></td>
  	<td>28/Ago</td>
  	<td>02/Sep</td>
- 	<td>Investigación y Reglas APA</td>
- 	<td>Reglas APA en los reportes estadísticos.
- 	<br><b>Asesoría para Entregable 1</b>.<br><b>Práctica Calificada 1</b>. </br>	</td>
+ 	<td colspan="2">PROPUESTA DE PROYECTO</td>
+ 	<td>Presentación de posibles clientes</td>
  </tr>
  
 <tr>
  	<td>4</td>
  	<td>04/Sep</td>
  	<td>09/Sep</td>
- 	<td rowspan="2">Correlación y Regresión</td>
- 	<td>Medición de la Correlación</td>
- 	<td> Exploración Bivariada en las escalas numéricas.
- 	<br>Coeficientes de Correlación.
- 	<br>Uso del SPSS para en análisis de Correlación.
- 	<br><b>Entregable 1</b>.</br> 
+ 	<td rowspan="3">Técnicas Descriptivas y Exploratorias</td>
+ 	<td>Detección de Conglomerados</td>
+ 	<td> Método k-medias.
+ 	<br> Método jerarquico.
+ 	<br> Método espacial.
  	</td>
  </tr>
 <tr>
  	<td>5</td>
  	<td>11/Sep</td>
  	<td>16/Sep</td>
- 	<td>Regresión simple</td>
- 	<td>Requisitos de la regresión simple.       <br> Interpretación de la regresión simple.<br><b>Práctica Calificada 2</b>.</br>
+ 	<td rowspan="2">Exploración dimensional</td>
+ 	<td>Escalamiento Multidimensional.       <br> Análisis de Correspondencia.</br>
  	</td>
  </tr>
  
@@ -195,58 +188,51 @@ ____
  	<td>6</td>
  	<td>18/Sep</td>
  	<td>23/Sep</td>
- 	<td rowspan="2">Tablas de Contingencia y Proporciones </td>
- 	<td>Asociación Bivariada entre Categóricas</td>
- 	<td>Construcción de Tablas de Contingencia.
- 	<br>Prueba Chi Cuadrado para diversos casos.
- 	<br>Uso del SPSS en el análisis de de asociación.</br> 
+ 	<td>Análisis de Componentes principales
  	</td>
  </tr>
 <tr>
  	<td>7</td>
  	<td>25/Sep</td>
  	<td>30/Sep</td>
- 	<td>Contrastes sobre proporciones</td>
- 	<td>Proporciones univariadas y bivariadas.       <br> Contrastes para proporciones independientes y relacionadas.
-       <br>Uso del SPSS para contrastar proporciones.
-       <br><b>Práctica Calificada 3</b></br></td>
+ 	<td rowspan="2">Modelamiento y Técnicas Predictivas </td>
+ 	<td>Regresión lineal</td>
+ 	<td>Modelo de regresión multiple</td>
  </tr>
 <tr>
  	<td>8</td>
  	<td>02/Oct</td>
  	<td>07/oct</td>
- 	<td colspan="2" rowspan="2"><b>EXAMENES PARCIALES</b></td>
- 	<td>Clase de Repaso: integración de unidades previas.
- 	<br><b>Asesoría Entregable 2</b>.
- 	<br><b>Asesoría Diario Reflexivo 1</b>.</br>  
+ 	<td >Regresión logística</td>
+ 	<td>Caso dicotomico.
+ 	<br>Caso multinomial no ordenado.
+ 	<br>Caso ordinal</br>  
  	</td>
  </tr>
  <tr>
  	<td>9</td>
  	<td>09/Oct</td>
  	<td>14/oct</td>
- 	<td> <b>Diario Reflexivo 1</b>.
- 	<br><b>Entregable 2</b>.</br></td>
+ 	
+ 	<td colspan="3"> <b>Reporte de status de proyecto final</td>
  </tr>
  
  <tr>
  	<td>10</td>
  	<td>16/Oct</td>
  	<td>21/Oct</td>
- 	<td rowspan="2">Regresión Multivariada</td>
- 	<td>Regresión Multivariada</td>
- 	<td>Determinación  de modelos multivariados.
- 	<br>Interpretación de modelos multivariados en SPSS.</br> 
+ 	<td rowspan="2">Modelamiento y Técnicas Predictivas (continuación)</td>
+ 	<td rowspan="2">Modelos longitudinales</td>
+ 	<td>Análisis de panel de datos.
+ 	<br>Análisis de Series de tiempo.</br> 
  	</td>
  </tr>
 <tr>
  	<td>11</td>
  	<td>23/Oct</td>
  	<td>28/Oct</td>
- 	<td>Regresión Multivariada con 'dummies' e introducción a la regresión Logística</td>
- 	<td>Regresión Multivariada con variables independientes categóricas.       <br>Modelamiento de variables categóricas.
-       <br>Regresión con "dummies' y Logística en SPSS.</br>
- 	</td>
+ 	
+ 	<td>Análisis de Eventos históricos. 	</td>
  </tr>
  
  
@@ -254,36 +240,27 @@ ____
  	<td>12<sup><a href="#fn2" id="ref2">2</a></sup></td>
  	<td>30/Oct</td>
  	<td>04/Nov</td>
- 	<td>Reducción de Dimensiones</td>
- 	<td>Análisis Factorial Exploratorio (AFE)</td>
- 	<td>Reducción de Dimensiones y AFE.
- 	<br>AFE en SPSS.</br> </td>
+ 	<td colspan='3'><b>Examen Integral</b></td>
  </tr>
  
  <tr>
  	<td>13</td>
  	<td>06/Nov</td>
  	<td>11/Nov</td>
- 	<td colspan="2">Encuesta de Opinión Docente</td>
- 	<td><b>Entregable 3</b>
- 	<br>Práctica Dirigida.
- 	<br><b>Asesoría Diario Reflexivo 2</b>.</br></td>
+ 	<td colspan="3">Asesoria Proyecto Final</td>
  </tr>
  
  <tr>
  	<td>14</td>
  	<td>13/Nov</td>
  	<td>18/Nov</td>
- 	<td>Reducción de Dimensiones</td>
- 	<td>Análisis Factorial Confirmatorio (AFC) y Ecuaciones estructurales</td>
- 	<td>Introducción al AFC.    <br>Introducción a las Ecuaciones Estructurales.
-    Práctica Dirigida.</br></td>
+ 	<td colspan="3">Asesoria Proyecto Final</td>
  </tr>
 <tr>
  	<td>15</td>
  	<td>20/Nov</td>
  	<td>25/Nov</td>
- 	<td colspan="3">REPASO Y ASESORIA</td>
+ 	<td colspan="3">Asesoria Proyecto Final</td>
  	
  </tr>
  
@@ -292,8 +269,7 @@ ____
  	<td>27/Nov</td>
  	<td>02/Dic</td>
  	<td colspan="2" rowspan="2">Cierre de Clases</td>
- 	<td><b>Práctica Calificada 5</b>: Todo el curso.
- 	<br><b>Entregable 4</b>.</br>
+ 	<td rowspan="2"><b>Presentación Proyecto Final</b>
  	</td>
  </tr>
  
@@ -301,15 +277,14 @@ ____
  	<td>17<sup><a href="#fn3" id="ref3">3</a></sup></td>
  	<td>04/Dic</td>
  	<td>09/Dic</td>
- 	<td><b>Entrega de Diarios Reflexivos finales</b>.</br>
- 	</td>
+ 	
  </tr>
  
   <tr>
  	<td>18</td>
  	<td>11/Dic</td>
  	<td>16/Dic</td>
- 	<td colspan="3" ><b>Exámenes de rezagados</b></br>
+ 	<td colspan="3" ><b>Entrega de promedios finales</b></br>
  	</td>
  </tr>
  
