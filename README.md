@@ -213,7 +213,6 @@ ____
  	<td>9</td>
  	<td>09/Oct</td>
  	<td>14/oct</td>
- 	
  	<td colspan="3"> <b>Reporte de status de proyecto final</td>
  </tr>
  
