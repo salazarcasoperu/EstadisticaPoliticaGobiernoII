@@ -142,7 +142,7 @@ ____
  	<td>19/Ago</td>
  	<td rowspan="2">Exploración de datos</td>
  	<td> Estadística e Investigación</td>
- 	<td> Revisión del Syllabus (foro on-line). 
+ 	<td> Revisión del Syllabus. 
  	<br> Recolección de Datos.</br> 
  	</td>
  </tr>
