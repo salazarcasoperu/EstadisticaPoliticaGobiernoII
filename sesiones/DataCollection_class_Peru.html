@@ -154,7 +154,8 @@ getwd()</code></pre>
 <pre class="r"><code>folder=&quot;data&quot;
 fileName=&quot;anes_timeseries_2012.sav&quot;
 fileToRead=file.path(folder,fileName)</code></pre>
-<p>En <em>fileToRead</em> estará la ruta correcta. Si hubiera una mayor secuencia de folders, <strong>file.path</strong> los concatenará sin problema. ____</p>
+<p>En <em>fileToRead</em> estará la ruta correcta. Si hubiera una mayor secuencia de folders, <strong>file.path</strong> los concatenará sin problema.</p>
+<hr />
 <p><a id="part1"></a></p>
 </div>
 <div id="data-de-proprietary-software" class="section level2">
@@ -279,6 +280,11 @@ library(sf)
 PeruRegs_shp &lt;- rgdal::readOGR(fileToRead)</code></pre>
 <p>Sin problema, el mapa se dibujará.</p>
 <pre class="r"><code>plot(PeruRegs_shp)</code></pre>
+<hr />
+<p><br /></p>
+<div id="volver-al-silabo" class="section level4">
+<h4><a href="https://politicaygobiernopucp.github.io/EstadisticaPoliticaGobiernoII/">VOLVER AL SILABO</a></h4>
+</div>
 </div>
 
 

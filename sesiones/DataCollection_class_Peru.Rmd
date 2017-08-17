@@ -40,6 +40,7 @@ fileToRead=file.path(folder,fileName)
 ```
 
 En _fileToRead_ estará la ruta correcta. Si hubiera una mayor secuencia de folders, **file.path** los concatenará sin problema.
+
 ____
 
 
@@ -240,3 +241,7 @@ Sin problema, el mapa se dibujará.
 plot(PeruRegs_shp)
 ```
 
+_____
+<br></br>
+
+####[VOLVER AL SILABO](https://politicaygobiernopucp.github.io/EstadisticaPoliticaGobiernoII/)
