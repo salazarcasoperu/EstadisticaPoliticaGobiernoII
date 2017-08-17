@@ -153,9 +153,9 @@ ____
  	<td>2</td>
  	<td>21/Ago</td>
  	<td>26/Ago</td>
- 	<td><a href="http://www.itl.nist.gov/div898/handbook/eda/eda.htm" target="_blank">Exploración de Datos y Formulación de Hipótesis</a></td>
- 	<td>Elementos del Análisis Exploratorio de Datos (AED).
- 	<br>Operacionalización de hipótesis a partir del AED.</td>
+ 	<td>Exploración de Datos y Formulación de Hipótesis</td>
+ 	<td><a href="http://www.itl.nist.gov/div898/handbook/eda/eda.htm" target="_blank">Lectura Previa: Análisis Exploratorio de Datos (AED)</a>.
+ 	<br>Uso del R para el AED.</td>
  </tr>
  
   <tr>
