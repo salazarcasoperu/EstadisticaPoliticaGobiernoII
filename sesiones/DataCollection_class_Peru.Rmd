@@ -104,7 +104,7 @@ Luego, hay que producir un URL para la data creada.
 
 require(RCurl)
 # obtained from google docs:
-link=''
+link='https://docs.google.com/spreadsheets/d/1bDMM5s3PDC5awrSkILFRPJMlQ0j95TtVxErvvNNOHPU/pub?output=csv'
 
 # getting info
 myCsv <- getURL(link)
