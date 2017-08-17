@@ -97,7 +97,7 @@ Cada componente pesa 50%.
 Donde:
 
 * PryAp otorga 5 puntos
-* PrtCa otorga 6 puntos
+* PrtCa otorga 7 puntos
 * ExIn otorga 8 puntos[INICIO](#beginning)
 ____
 <a id='part6'></a>
