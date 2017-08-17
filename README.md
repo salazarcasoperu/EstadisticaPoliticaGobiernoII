@@ -96,7 +96,7 @@ Cada componente pesa 50%.
 
 Donde:
 
-* PryAp otorga 6 puntos
+* PryAp otorga 5 puntos
 * PrtCa otorga 6 puntos
 * ExIn otorga 8 puntos[INICIO](#beginning)
 ____
@@ -143,7 +143,7 @@ ____
  	<td rowspan="2">Exploración de datos</td>
  	<td> Estadística e Investigación</td>
  	<td> Revisión del Syllabus. 
- 	<br> Recolección de Datos.</br> 
+ 	<br> <a href="https://rawgit.com/PoliticayGobiernoPUCP/EstadisticaPoliticaGobiernoII/master/sesiones/DataCollection_class_Peru.html">Recolección de Datos</a>.</br> 
  	</td>
  </tr>
  
