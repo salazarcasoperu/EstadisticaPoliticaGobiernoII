@@ -30,7 +30,9 @@ ____
 * Horas de práctica: **Dos** (2)
 * Carácter: **Obligatorio**
 * Pre-requisitos: **Estadística para el Análisis Político 1**
-* Profesor:  [__Dr. José Manuel Magallanes, PhD__](http://www.pucp.edu.pe/profesor/jose-manuel-magallanes/)  ([jmagallanes@pucp.edu.pe](mailto:jmagallanes@pucp.edu.pe))[INICIO](#beginning)
+* Profesor:  <a href="http://www.pucp.edu.pe/profesor/jose-manuel-magallanes/" target="_blank">Dr. José Manuel Magallanes, PhD</a> ([jmagallanes@pucp.edu.pe](mailto:jmagallanes@pucp.edu.pe))
+
+ [INICIO](#beginning)
 ____
 <a id='part2'></a>
 ### 2. Sumilla
@@ -143,7 +145,7 @@ ____
  	<td rowspan="2">Exploración de datos</td>
  	<td> Estadística e Investigación</td>
  	<td> Revisión del Syllabus. 
- 	<br> <a href="https://rawgit.com/PoliticayGobiernoPUCP/EstadisticaPoliticaGobiernoII/master/sesiones/DataCollection_class_Peru.html">Recolección de Datos</a>.</br> 
+ 	<br> <a href="https://rawgit.com/PoliticayGobiernoPUCP/EstadisticaPoliticaGobiernoII/master/sesiones/DataCollection_class_Peru.html" target="_blank">Recolección de Datos</a>.</br> 
  	</td>
  </tr>
  
