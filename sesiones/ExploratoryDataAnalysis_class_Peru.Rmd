@@ -177,6 +177,319 @@ myData$religion=factor(myData$religion)  # valores texto a categorico
 Gini(as.numeric(myData$religion),na.rm = TRUE) # categorico a numerico
 ```
 
+
+
+<br> 
+<center><img src="http://i.imgur.com/sSaOozN.png" width="500"></center>
+
+# Data Exploration in R
+## Bivariate Case
+
+## Course: Computational Thinking for Governance Analytics<br> Winter 2017<br> 
+
+### Prof. José Manuel Magallanes, PhD 
+<a id='beginning'></a>
+
+Bivariate exploration needs to follow the following order:
+
+1. [Categorical - Categorical](#part1) 
+2. [Categorical - Numerical](#part2) 
+3. [Numerical - Numerical](#part3) 
+
+
+____
+
+
+<a id='part1'></a>
+
+## Categorical - Categorical
+
+For this section, let's work with data about [Contributions to Candidates and Political Committees](https://dev.socrata.com/foundry/data.wa.gov/74eq-kst5) from the Washington State Open data portal:
+
+
+```{r}
+governor=read.csv('data/governor.csv',stringsAsFactors = F)
+```
+
+A quick look to the types we have:
+
+```{r}
+str(governor)
+```
+
+Let's check the distribution of _party_:
+```{r}
+table(governor$party)
+```
+
+... and _election year_:
+```{r}
+table(governor$election_year)
+```
+
+The basic way to analyze cat-cat relationships (association) is the **contingency table** (crosstab):
+```{r}
+table(governor$party,governor$election_year)
+```
+
+R has a particular package with many option for this kind of exploration:
+
+```{r}
+library(gmodels)
+CrossTable(governor$party,governor$election_year,prop.t=F, prop.r=F, prop.c=F,prop.chisq=F)
+```
+We could focus just in the contributions to Reps or Dems:
+
+```{r}
+byeCategories=c('INDEPENDENT','NONE')
+governorDR=governor[!governor$party%in% byeCategories,]
+```
+
+Let's try again, now showing percents:
+```{r}
+CrossTable(governorDR$party,governorDR$election_year,prop.t=T, prop.r=F, prop.c=F,prop.chisq=F)
+```
+We can see the same results, but using relative values:
+```{r}
+# Share along years per party:
+CrossTable(governorDR$party,governorDR$election_year,prop.t=F, prop.r=T, prop.c=F,prop.chisq=F)
+```
+
+```{r}
+# Share along parties per year:
+CrossTable(governorDR$party,governorDR$election_year,prop.t=F, prop.r=F, prop.c=T,prop.chisq=F)
+```
+
+
+We can also use ${\chi}^2$ to test if the cells values represent some association between the variables:
+
+```{r}
+CrossTable(governorDR$party,governorDR$election_year,prop.t=F, prop.r=F, prop.c=F,prop.chisq=F,chisq=T)
+```
+This is simple visual representation:
+
+```{r}
+legendPlot=levels(as.factor(unique(governorDR$party)))
+bartable = table(governorDR$party,governorDR$election_year)  ## get the cross tab
+barplot(bartable, beside = TRUE,legend=legendPlot)  ## plot
+
+```
+
+For sure, you can represent the cross table in a nicer way:
+```{r}
+library(ggplot2)                           
+
+#turn table into a data frame:
+governorDRTb=as.data.frame(table(governorDR$party,governorDR$election_year))
+names(governorDRTb)=c('party','election_year','f')
+
+
+
+#Plot the Data
+g <- ggplot(governorDRTb, aes(party, election_year)) + geom_point(aes(size = f), colour = "green") + theme_bw() + xlab("") + ylab("") +theme(legend.position="none")
+g + scale_size_continuous(range=c(5,30)) + geom_text(aes(label = f))
+```
+
+____
+
+<a id='part2'></a>
+
+## Categorical - Numerical
+
+We need to vary a little our strategy. We 'll see here that the cell represents a function applied to numeric values:
+
+```{r}
+with(governorDR, tapply(amount, list(code=code,party=party), mean) )
+```
+
+Above, each cell is the mean by a contributors to a party.
+
+We could use again boxplots to see differences in the distribution of a numerical variable:
+```{r}
+business = governorDR[governorDR$code=='Business',]
+p <- ggplot(business, aes(party, amount))
+
+p + geom_boxplot()
+
+```
+
+
+I want to build confidence intervals of these variables:
+```{r}
+# Function for the standard error (se):
+seMean = function(x) sd(x)/sqrt(length(x))
+
+# Means by group
+means=aggregate(list(mean=business$amount),
+          list(party=business$party),mean)
+
+# se by group: (I am using my fucntion here)
+sems=aggregate(list(seMean=business$amount),
+          list(party=business$party),seMean)
+
+# a new data frame:
+data=merge(means,sems) # party is the assumed 'key'
+
+# adding confidence interval limits:
+data$lower=data$mean-2*data$seMean
+data$upper=data$mean+2*data$seMean
+
+## HERE IT IS:
+data
+
+```
+
+We can use the above information to make a plot:
+```{r}
+# this creates a plot of  the points (means):
+meanPlot = ggplot(data, aes(y=mean, x=party)) + geom_point()
+
+# this adds the error bars:
+errorPlot = meanPlot + geom_errorbar(aes(ymin = lower, ymax = upper))
+
+# final result
+errorPlot
+```
+
+
+The previous information suggests there is too much intersection between the intervals, so a t-test should be non-significant:
+
+
+```{r}
+t.test(business$amount~business$party,var.equal = T)
+```
+The t-test suggests the means are not different. Can we conclude that both groups behave similarly? 
+
+Let me plot the distribition of both groups:
+```{r}
+ggplot(business, aes(amount, colour = party)) +
+  geom_density() 
+```
+
+Let's try a non-parametric test to ask if both distributions are similar:
+```{r}
+wilcox.test(amount ~ party, data=business)
+```
+The non-parametric case found that both distributions are different. 
+
+Let's see a more complicated case (more than two categories):
+```{r}
+m <- ggplot(governorDR, aes(x = amount))
+m + geom_histogram(bins=20) + facet_wrap(~code,scales = "free")
+```
+
+
+In this case, we can use the ANOVA (for one factor), and see if the polytomous variable creates different means:
+```{r}
+model = aov(amount ~ code, data = governorDR)
+summary(model)
+
+```
+It detects _code_ produces differences, let's see where they are using Tukey test for post hoc comparisons:
+```{r}
+TukeyHSD(model)
+```
+
+The result is too long, this is a simplified version:
+```{r, size=9}
+result=as.data.frame(TukeyHSD(model)$code)
+result[4]<0.05
+```
+
+A non-parametric alternative is the Kruskal-Wallis test.
+
+This code will give you an error, because I did not formatted _code_ as a category (factor):
+```{r, eval=FALSE}
+kruskal.test(amount ~ code, data = governorDR)
+```
+
+This works:
+
+```{r}
+kruskal.test(amount ~ as.factor(code), data = governorDR)
+```
+The result confirms the previous finding using the F distribution. Let's use a post-hoc to see if the pairwise differences are the same:
+```{r}
+library(dunn.test)
+result=dunn.test(governorDR$amount,as.factor(governorDR$code),  method="bh",kw=F)  
+```
+
+Again, this is an easier way to see the last result:
+
+```{r}
+data.frame(comparisons=result$comparisons,pval=result$P.adjusted<0.05)
+```
+
+We could try a more computational approach (**bootstrapping**):
+```{r, message=FALSE}
+library(rms)
+library(dplyr)
+governorDR %>%
+  group_by(code) %>%
+  do(data.frame(rbind(smean.cl.boot(.$amount,B=1000))))
+```
+
+____
+
+<a id='part3'></a>
+
+## Numerical - Numerical
+
+Data from [Medicare Beneficiary Enrollment and Demographics](https://dev.socrata.com/foundry/data.wa.gov/2cup-2fnu)
+```{r}
+library(jsonlite) 
+apiResponse="https://data.wa.gov/resource/2cup-2fnu.json?year=2014"
+medicare = fromJSON(apiResponse)
+head(medicare)
+```
+There are data that includes **totals** (first row above), you want to get rid of those:
+
+```{r}
+medicare2014=medicare[-1,]
+```
+
+```{r}
+#resetting index after deletion
+row.names(medicare2014)=NULL
+```
+
+```{r}
+# what we have
+str(medicare2014)
+```
+
+I want to analyse the 'percents' in these data set, but some formatting is needed:
+```{r}
+#positions
+names(medicare2014)
+```
+
+```{r}
+#to numeric
+medicare2014[,c(8:14)]=lapply(medicare2014[,c(8:14)],as.numeric)
+```
+We can start num-num analysis now, also known and **correlation**:
+```{r}
+res <- cor(medicare2014[,c(8:14)],use='complete.obs')
+round(res, 2)
+```
+Notice that the exact correlation between male and female may be discarded.
+
+A visual representation of the correlation:
+```{r}
+library(car)
+scatterplotMatrix(medicare2014[,c(8:14)], 
+   main="Simple Scatterplot Matrix")
+```
+
+
+For sure, the non-parametric version can be computed:
+```{r}
+cor(medicare2014[,c(8:14)],use='complete.obs',method='spearman')
+```
+
+
+
 [Inicio](#beginning)
 
 ______
