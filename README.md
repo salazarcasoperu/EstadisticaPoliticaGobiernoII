@@ -151,13 +151,15 @@ ____
  
  
  
+ 
  <tr>
  	<td>2</td>
  	<td>21/Ago</td>
  	<td>26/Ago</td>
  	<td>Exploración de Datos y Formulación de Hipótesis</td>
  	<td><a href="http://www.itl.nist.gov/div898/handbook/eda/eda.htm" target="_blank">Lectura Previa: Análisis Exploratorio de Datos (AED)</a>.
- 	<br>Uso del R para el AED.</td>
+ 	 <br> <a href="https://rawgit.com/PoliticayGobiernoPUCP/EstadisticaPoliticaGobiernoII/master/sesiones/ExploratoryDataAnalysis_class_Peru.html" target="_blank">Uso del R para el AED</a>.</br> 
+
  </tr>
  
   <tr>
