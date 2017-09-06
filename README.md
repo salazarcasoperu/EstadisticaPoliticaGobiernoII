@@ -176,8 +176,8 @@ ____
  	<td>09/Sep</td>
  	<td rowspan="3">Técnicas Descriptivas y Exploratorias</td>
  	<td>Detección de Conglomerados</td>
- 	<td> Método k-medias.
- 	<br> Método jerarquico.
+ 	<td> <a href="https://rawgit.com/PoliticayGobiernoPUCP/EstadisticaPoliticaGobiernoII/master/sesiones/ClusterAnalysis_class_Peru.html" target="_blank">Método jerarquico</a>.
+ 	<br> Método k-medias.
  	<br> Método espacial.
  	</td>
  </tr>
