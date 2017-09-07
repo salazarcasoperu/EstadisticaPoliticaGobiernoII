@@ -1,0 +1,331 @@
+<br> 
+<center><img src="http://i.imgur.com/tveTlt8.png" width="300"></center>
+
+## Course: Estadística Para el Análisis Político II<br> Semestre 2017-II<br> 
+### Prof. José Manuel Magallanes, PhD 
+____
+## **Análisis Multivariado**
+## Técnicas Descriptivas y Exploratorias (Parte II)
+____
+
+<a id='beginning'></a>
+
+Los datos presentes en el archivo Excel:
+```{r, eval=FALSE}
+library(openxlsx)
+folder='data'
+fileName='idePeru.xlsx'
+fileToRead=file.path(folder,fileName)
+```
+
+Los convertimos a un formato adecuado:
+
+
+```{r, eval=FALSE}
+
+# lectura
+cualHoja=1
+filaInicial=4
+datos=read.xlsx(fileToRead, 
+                sheet = cualHoja, 
+                startRow = filaInicial, 
+                skipEmptyRows = TRUE, skipEmptyCols = TRUE)
+
+# eliminando filas innecesarias:
+## al final
+
+filasEliminar=c(223:226)
+datos=datos[-filasEliminar,]
+
+## al inicio
+filasEliminar=c(1:3)
+datos=datos[-filasEliminar,]
+
+# creando TABLA de regiones
+queColumnasSacar=c(1,2)
+regiones=datos[,queColumnasSacar]
+
+# manteniendo solo casos completos por fila:
+regiones=regiones[complete.cases(regiones),]
+
+# Cambiando nombres a la TABLA  de region:
+nombresNuevos=c('regionUbigeo','regionNombre')
+names(regiones)=nombresNuevos
+
+# creando tabla de provincias
+
+queColumnasEliminar=c(2)
+provincias=datos[,-queColumnasEliminar] #signo '-'
+
+# Eliminando columnas innecesarias:
+
+deDosenDos=seq(4,16,2) # 4,6,8, etc.
+queColumnasEliminar=c(deDosenDos)
+provincias=provincias[,-queColumnasEliminar]
+
+#Nuevamente, podemos quedarnos con los casos completos por fila en la TABALA provincias:
+provincias=provincias[complete.cases(provincias),]
+
+#Renombremos las dos primeras columnas
+
+names(provincias)[c(1,2)]=c('provinciaUbigeo','provinciaNombre')
+
+# renombrando columnas restantes:
+
+names(provincias)[c(3:9)]=c('pob2012','ide2012','identificacion2012','medicos2012','escolaridad2012','AguaDesague2012','electrificacion2012')
+
+# asegurandose los numeros sean leidos por R como tales:
+provincias[,c(3:9)]=lapply(provincias[,c(3:9)],as.numeric)
+
+#crear la columna _regionUbigeo_, usando _provinciaUbigeo
+provincias$regionUbigeo=provincias$provinciaUbigeo
+
+#A la nueva columna le reemplazamos con '0000' todo valor luego de los primeros dos digitos:
+
+substr(provincias$regionUbigeo,3,6)='0000'
+
+
+# reubicar la posición de la última columna:
+provincias=provincias[,c(10,1:9)] 
+
+#Hagamos el 'merge', entre las dos TABLAS:
+# como 'regionUbigeo' aparece en ambas, no es necesario
+# ponerlo:
+provinciasNew=merge(provincias,regiones,all.x = TRUE) 
+
+# La columna con el nombre de region se ha añadido a la tabla provincias. Por defecto R manda esa columna al final. Movamos de posición esa columna nueva:
+provinciasNew=provinciasNew[,c(1:2,11,3:10)]
+```
+
+Asi quedó:
+
+```{r, eval=FALSE}
+head(provinciasNew)
+```
+
+
+Aglomeraremos a las provincias de esta data. Pero primero hagamos 2 pasos previos.
+
+1) Quedemonos con las columnas que necesitamos:
+```{r, eval=FALSE}
+columnasUtilizar=c(7:11)
+df=provinciasNew[columnasUtilizar]
+```
+
+2) Usar el nombre de provincia como la etiqueta de la fila:
+```{r, eval=FALSE}
+row.names(df)=provinciasNew$provinciaNombre
+head(df)
+```
+
+2) Llevarlos datos a utilizar a una unidad comun ( o sin unidad de medida):
+
+```{r, eval=FALSE}
+df1.scaled=scale(df)
+```
+
+
+3) Crear 'distancias' entre las filas usando la información multivariada. No lo haremos pues NbClust lo hace.
+
+
+4) Tratar de identificar el numero de clusters que se necesitarán:
+
+```{r, eval=FALSE}
+library(NbClust)
+nb <- NbClust(df.scaled1, method = "complete") # 'method' indica como crear distancias.
+```
+
+5) Aplicar el **algoritmo** deseado:
+
+```{r, eval=FALSE}
+library(factoextra)
+algoritmo="hclust"
+cuantosClusters=3
+solucionJerarquica1 <- eclust(df.scaled1, 
+                              FUNcluster =algoritmo,
+                              k = cuantosClusters,
+                              method = "complete", # como en nb!
+                              graph = FALSE) 
+
+fviz_dend(solucionJerarquica1, rect = TRUE, show_labels = T) 
+```
+
+6) Evaluar qué tan buena ha sido nuestra aglomeración:
+
+```{r, eval=FALSE}
+# Un valor cercano a **uno** indica que el valor está bien aglomerado, si está cercano a cero indica que esta entre dos conglomerados, y si es negativo, que está en un cluster erróneo (al algoritmo acabó y no pudo ubicarlo en el grupo adecuado).
+
+fviz_silhouette(solucionJerarquica1)
+```
+
+
+
+7) El objeto _res.hc_ guarda la información de silueta. Cada provincia tiene su propio valor. Podemos detectar qué provincia no ha sido bien conglomerada:
+
+```{r, eval=FALSE}
+siluetasPorProvincia <-solucionJerarquica1$silinfo$widths
+
+# quedarse con las negativas:
+siluetasPorProvincia[siluetasPorProvincia$sil_width<0,]
+```
+
+
+8) Podemos reintentar lo anterior, cambiando los parámetros de la función **scale**, pues los valores por defecto de esa función son la media y la desviación típica (lo que dió z-scores); pero, podríamos usar las medianas y la desviaciónes de la mediana en vez de ellas:
+
+```{r, eval=FALSE}
+medians = apply(df,2,median)
+mads = apply(df,2,mad)
+df.scaled2 = scale(df,center=medians,scale=mads)
+```
+
+9) Podriamos reintentar clusterizar usando una tecnica alternativa:
+
+```{r, eval=FALSE}
+algoritmo="kmeans"
+cuantosClusters=3
+solucionKmeans1 <- eclust(df.scaled1, 
+                              FUNcluster =algoritmo,
+                              k = cuantosClusters, # como en nb!
+                              graph = FALSE) 
+fviz_cluster(solucionKmeans1, geom = "point", ellipse = F)
+```
+
+```{r, eval=FALSE}
+fviz_silhouette(solucionKmeans1)
+```
+
+```{r, eval=FALSE}
+siluetasPorProvincia <-solucionKmeans1$silinfo$widths
+
+# quedarse con las negativas:
+siluetasPorProvincia[siluetasPorProvincia$sil_width<0,]
+```
+
+## Mapas y clusters
+
+Tenemos 2 tablas diferentes, _provinciasNew_, con los valores originales, y _solucionJerarquica1_ con los clusters asignados:
+```{r,eval=FALSE}
+head(provinciasNew)
+```
+
+_solucionJerarquica1_ guarda los clusters en **cluster**; pero **solucionJerarquica1$cluster** no es un data frame, hay que convertirlo en eso:
+
+```{r,eval=FALSE}
+clustJerar1=as.data.frame(solucionJerarquica1$cluster)
+head(clustJerar1)
+```
+
+Recuerda que no hay columna con el nombre de la provincia, por lo que necesitamos poner los nombres de las filas como una columna:
+```{r,eval=FALSE}
+clustJerar1$provinciaNombre=row.names(clustJerar1)
+row.names(clustJerar1)=NULL  #borramos
+```
+
+Ahora podemos hacer el merge. Como ambos tienen la columna _provinciaNombre_, el merge no requiere mas argumentos:
+
+```{r,eval=FALSE}
+provinciasClust=merge(provinciasNew,clustJerar1)
+head(provinciasClust)
+```
+
+Traigamos un mapa ahora:
+
+```{r, eval=FALSE}
+folder='data'
+folderMap='PER_adm_shp'
+fileName='PER_adm2.shp' # nivel 2 son provincias
+fileToRead=file.path(folder,folderMap,fileName)
+
+library(rgdal)
+PeruProvs <- rgdal::readOGR(fileToRead,stringsAsFactors=FALSE)
+```
+
+Sin problema, el mapa se dibujará.
+```{r, eval=FALSE}
+plot(PeruProvs, border='grey')
+```
+
+Ambos tiene 195 filas. Veamos como se identifican las provincias:
+
+```{r,eval=FALSE}
+head(PeruProvs@data)
+```
+
+Podemos ver que en NAME_2 estan los nombres de provincias (ordenados):
+```{r,eval=FALSE}
+sort(PeruProvs@data$NAME_2)
+```
+
+Se parecen a los que tenemos?
+```{r,eval=FALSE}
+provinciasClust$provinciaNombre
+```
+
+Parece que sí, pero no lo sabremos antes del merge. Hagamos un test:
+
+```{r,eval=FALSE}
+test=merge(PeruProvs@data,provinciasClust,by.x='NAME_2',by.y='provinciaNombre',all.x=T)
+```
+
+Cuando no hay coincidencias, merge crea un valor NA (missing). Aqui detecto que filas del mapa no encontraron coincidencias:
+
+```{r,eval=FALSE}
+test[is.na(test$ide2012),]
+```
+
+Vemos que hay 16 provincias que no serían ploteadas, al menos que cambiemos los nombres en _provinciasClust_. 
+
+Si seguimos sin hacer los cambios:
+```{r,eval=FALSE}
+PeruProvs=merge(PeruProvs,provinciasClust,by.x='NAME_2',by.y='provinciaNombre',all.x=T)
+```
+
+Para graficar, deberiamos tener idea de la posicion de las provincias. Lima debe estar bien, quiero saber en que cluster está:
+```{r,eval=FALSE}
+PeruProvs@data[PeruProvs@data$NAME_2=='Lima',]$`solucionJerarquica1$cluster`
+```
+
+De igual forma, Atalaya debe estar entre los peores:
+
+```{r,eval=FALSE}
+PeruProvs@data[PeruProvs@data$NAME_2=='Atalaya',]$`solucionJerarquica1$cluster`
+```
+
+De ahi que sabemos que los mejores estan en el cluster '3', los peores en el '2', y los intermedios en el '1'.
+Creemos una nueva variable:
+
+```{r,eval=FALSE}
+PeruProvs@data$clusterJera1=PeruProvs@data$`solucionJerarquica1$cluster`
+PeruProvs@data$clusterJera1=ifelse(PeruProvs@data$clusterJera1==1,4,PeruProvs@data$clusterJera1)
+
+PeruProvs@data$clusterJera1=ifelse(PeruProvs@data$clusterJera1==2,1,PeruProvs@data$clusterJera1)
+
+PeruProvs@data$clusterJera1=ifelse(PeruProvs@data$clusterJera1==4,2,PeruProvs@data$clusterJera1)
+```
+
+Aquí si 1,2,3 van de menos a mas, y eso lo reflejo en la secuencia de colores a usar:
+
+
+```{r,eval=FALSE}
+myColors=c('red','yellow','lightblue') 
+plot(PeruProvs,col=myColors[PeruProvs$'solucionJerarquica1$cluster'], main='Densidad del Estado - usando clusters',borders=NA)
+```
+
+Comparemos con el IDE original. Primero dividamos los valores en 3 intervalos:
+```{r,eval=FALSE}
+PeruProvs@data$ideK=cut(PeruProvs@data$ide2012,
+                       breaks=3,labels=c('1','2','3'))
+```
+
+Como 1,2,3 van de menos a mas, casi nada cambia:
+```{r,eval=FALSE}
+plot(PeruProvs,col=myColors[PeruProvs$ideK],main='Densidad del Estado',border=NA)
+```
+
+Aqui están las no coincidencias:
+```{r,eval=FALSE}
+test2=PeruProvs@data
+test2=test2[complete.cases(test2$ide2012),]
+test2[test2$ideK != test2$clusterJera1,]
+```
+
