@@ -258,7 +258,7 @@ fviz_dend(solucionJerarquica1, rect = TRUE, show_labels = T) </code></pre>
 
 fviz_silhouette(solucionJerarquica1)</code></pre>
 <ol start="7" style="list-style-type: decimal">
-<li>El objeto <em>res.hc</em> guarda la información de silueta. Cada provincia tiene su propio valor. Podemos detectar qué provincia no ha sido bien conglomerada:</li>
+<li>El objeto <em>solucionJerarquica1</em> guarda la información de silueta. Cada provincia tiene su propio valor. Podemos detectar qué provincia no ha sido bien conglomerada:</li>
 </ol>
 <pre class="r"><code>siluetasPorProvincia &lt;-solucionJerarquica1$silinfo$widths
 
@@ -335,7 +335,7 @@ PeruProvs@data$clusterJera1=ifelse(PeruProvs@data$clusterJera1==2,1,PeruProvs@da
 PeruProvs@data$clusterJera1=ifelse(PeruProvs@data$clusterJera1==4,2,PeruProvs@data$clusterJera1)</code></pre>
 <p>Aquí si 1,2,3 van de menos a mas, y eso lo reflejo en la secuencia de colores a usar:</p>
 <pre class="r"><code>myColors=c('red','yellow','lightblue') 
-plot(PeruProvs,col=myColors[PeruProvs$'solucionJerarquica1$cluster'], main='Densidad del Estado - usando clusters',borders=NA)</code></pre>
+plot(PeruProvs,col=myColors[PeruProvs$clusterJera1], main='Densidad del Estado - usando clusters',borders=NA)</code></pre>
 <p>Comparemos con el IDE original. Primero dividamos los valores en 3 intervalos:</p>
 <pre class="r"><code>PeruProvs@data$ideK=cut(PeruProvs@data$ide2012,
                        breaks=3,labels=c('1','2','3'))</code></pre>

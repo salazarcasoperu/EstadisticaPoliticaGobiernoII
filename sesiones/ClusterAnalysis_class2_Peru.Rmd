@@ -160,7 +160,7 @@ fviz_silhouette(solucionJerarquica1)
 
 
 
-7) El objeto _res.hc_ guarda la información de silueta. Cada provincia tiene su propio valor. Podemos detectar qué provincia no ha sido bien conglomerada:
+7) El objeto _solucionJerarquica1_ guarda la información de silueta. Cada provincia tiene su propio valor. Podemos detectar qué provincia no ha sido bien conglomerada:
 
 ```{r, eval=FALSE}
 siluetasPorProvincia <-solucionJerarquica1$silinfo$widths
@@ -308,7 +308,7 @@ Aquí si 1,2,3 van de menos a mas, y eso lo reflejo en la secuencia de colores a
 
 ```{r,eval=FALSE}
 myColors=c('red','yellow','lightblue') 
-plot(PeruProvs,col=myColors[PeruProvs$'solucionJerarquica1$cluster'], main='Densidad del Estado - usando clusters',borders=NA)
+plot(PeruProvs,col=myColors[PeruProvs$clusterJera1], main='Densidad del Estado - usando clusters',borders=NA)
 ```
 
 Comparemos con el IDE original. Primero dividamos los valores en 3 intervalos:
