@@ -1,0 +1,198 @@
+<br> 
+<center><img src="http://i.imgur.com/tveTlt8.png" width="300"></center>
+
+## Course: Estadística Para el Análisis Político II<br> Semestre 2017-II<br> 
+### Prof. José Manuel Magallanes, PhD 
+____
+## **Análisis Multivariado**
+## Técnicas Descriptivas y Exploratorias (Parte III)
+____
+
+<a id='beginning'></a>
+
+Carguemos la data:
+```{r, eval=TRUE}
+folder='data'
+fileName='idePeru2012.csv'
+fileToRead=file.path(folder,fileName)
+ide12=read.csv(fileToRead,strip.white = T,
+                 colClasses=c(rep('character',4),
+                              rep('numeric',7),
+                              rep('factor',3)))
+```
+
+Veamos estructura:
+
+```{r, eval=TRUE}
+str(ide12)
+```
+
+La variable TAMANO debe ser ordinal:
+```{r, eval=TRUE}
+ide12$TAMANO=as.ordered(ide12$TAMANO)
+```
+
+Cambiemos el IDE y todos sus componentes a ordinal (5 niveles). Para ello, primero creemos cinco nuevas variables (estarán vacías):
+
+```{r, eval=TRUE}
+ide12$elcOrd=ide12$sanOrd=ide12$eduOrd=ide12$salOrd=ide12$idOrd=NA
+```
+
+
+Ahora démosle valores a las variables recién creadas. Se crearán tres niveles en cada una, pero les daremos diferentes nombres para que se note el propósito de la técnica:
+
+```{r, eval=TRUE}
+gruposCantidad=3
+etiquetas1=c('bajo','medio','alto')
+ide12[,c(15:17)]=lapply(ide12[,c(6:8)],cut,
+       breaks = gruposCantidad,
+       labels = etiquetas1,
+       ordered_result = T)
+
+###
+
+etiquetas2=c('malo','regular','bueno') # usando otra etiqueta
+ide12[,c(18:19)]=lapply(ide12[,c(9:10)],cut,
+       breaks = gruposCantidad,
+       labels = etiquetas2,
+       ordered_result = T)
+
+```
+
+Una mirada:
+```{r, eval=TRUE}
+summary(ide12[,c(15:19)])
+```
+
+```{r, eval=TRUE}
+str(ide12)
+```
+
+
+## Escalamiento multidimensional
+
+Seleccionemos una variables, y calculemos su distancia:
+
+```{r, eval=TRUE}
+dataMap=ide12[,c(6:10)]
+d <- dist(dataMap) # nuevamente
+```
+
+Hasta aquí está similar al análisis cluster. Podemos ahora calcular el escalamiento:
+
+```{r}
+fit1 <- cmdscale(d,eig=TRUE, k=2) # k sugiere dimensiones
+fit1$GOF # mientras mas cerca a 1 mejor.
+
+```
+
+Veamos el 'mapa' que se ha creado:
+
+```{r, eval=TRUE}
+labelsMap=ide12$COSTA
+dimension1 <- fit1$points[,1]
+dimension2 <- fit1$points[,2]
+cols=c('red','blue')
+plot(dimension1, dimension2, xlab="Dimensión 1", ylab="Dimensión 2", 
+  main="EMD con data numerica",	type="n")
+text(dimension1, dimension2, 
+     labels = labelsMap, 
+     cex=.7,col=cols[labelsMap]) 
+
+```
+
+Intentemos agregar la data:
+
+```{r, eval=TRUE}
+regionIde12=aggregate(cbind(IDENTIDAD,SALUD, EDUCACION,SANEAMIENTO, ELECTRIFICACION) ~ DEPARTAMENTO,data=ide12,FUN=mean)
+regionIde12
+```
+
+
+Sus distancias:
+
+```{r, eval=TRUE}
+dataMap=regionIde12[,c(2:6)]
+d <- dist(dataMap) # nuevamente
+```
+
+Que tal ajuste dio el escalamiento:
+```{r}
+fit <- cmdscale(d,eig=TRUE, k=2) # k sugiere dimensiones
+fit$GOF # mientras mas cerca a 1 mejor.
+```
+
+Con ese resultado, podemos crear otro mapa:
+
+```{r, eval=TRUE}
+labelsMap=regionIde12$DEPARTAMENTO
+dimension1 <- fit$points[,1]
+dimension2 <- fit$points[,2]
+plot(dimension1, dimension2, xlab="Dimensión 1", ylab="Dimensión 2", 
+  main="EMD con data numerica",	type="n")
+text(dimension1, dimension2, labels = labelsMap, cex=.5) 
+```
+
+Hast aqui hemos visto cómo se organizan las unidades de estudio (provincias o regiones). Veamos ahora como analizar data categórica.
+
+## Data Categórica
+
+
+La Data categórica se explora usando la tabla de contingencia:
+```{r, eval=TRUE}
+tabla=table(ide12$TAMANO,ide12$eduOrd)
+prop.table(tabla)
+```
+
+Luego, con la prueba Chi-Cuadrado se pregunta si el comportamiento conjunto expresa asoción:
+```{r, eval=TRUE}
+chisq.test(tabla)
+```
+
+Se ha obtenido un resultado no confiable, pues algun requisito de la prueba no se puede sostener (hay celdas menores que 5, y hasta un cero). Lo bueno es que R alerta que podria ser incorrecto, y nos da una salida no paramétrica:
+
+```{r, eval=TRUE}
+chisq.test(tabla,simulate.p.value = T)
+```
+
+Si el valor del **p-value** es menor a **0.05**, se asume que hay asociación (formalmente estamos rechanzando la hipotesis nula: "la variables son independientes").
+
+
+Hasta aqui sabemos que las variables están relacionadas, pero no tenemos mayor detalle de cómo es esa relación. Es aquí donde aparece el **análisis de correspondencias**. Éste es un análisis gráfico que permite conocer como se están asociando las categorías.
+
+Se comienza por calcular la tabla de correspondencias, a partir de la tabla de contingencia:
+
+```{r, eval=TRUE}
+library(ca)
+tablaCA=ca(tabla)
+```
+
+
+Este objeto tiene información interesante:
+```{r}
+tablaCA
+```
+
+Si revisamos los **eigenvalues** vemos que la tabla se ha descompuesto en dos dimensiones, y que la primera recoge la mayor información:
+
+```{r, eval=TRUE}
+plot.ca(tablaCA, col=c("red","blue"))
+```
+
+De los resultados notemos lo siguiente:
+
+* Distancias del origen: la categoría malo y bajo son las que discriminan/diferencian más a las provincias; dada su lejanía del origen, podemos concluir que hay las provincias que tienen valores bajoes en una variable, lo tienen también en la otra. Por otro lado, los valores intermedios al estar más cerca al origen, son las que menos ayudan a diferenciar; y aunque estén cerca entre sí (como lo estaban las otras categorías) no podemos afirmar que las provincias de nivel intermedio en una variable son casi las mismas en la otra variable.
+
+
+* no debe sorprender que cada categoria de una variable se asocia con su simil de la otra variable. Pero aquí se puedo haber detectado algo diferente. Notese además que hay más cercanía entre los valores medios y buenos en la dimensión 2, por lo que los los valore bajos están más distantes de ambos, en esa dimensión.
+
+
+
+[Inicio](#beginning)
+
+______
+
+
+<br></br>
+
+####[VOLVER AL SILABO](https://politicaygobiernopucp.github.io/EstadisticaPoliticaGobiernoII/)

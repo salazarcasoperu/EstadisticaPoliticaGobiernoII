@@ -132,7 +132,7 @@ df1.scaled=scale(df)
 
 ```{r, eval=FALSE}
 library(NbClust)
-nb <- NbClust(df.scaled1, method = "complete") # 'method' indica como crear distancias.
+nb <- NbClust(df1.scaled, method = "complete") # 'method' indica como crear distancias.
 ```
 
 5) Aplicar el **algoritmo** deseado:
@@ -141,7 +141,7 @@ nb <- NbClust(df.scaled1, method = "complete") # 'method' indica como crear dist
 library(factoextra)
 algoritmo="hclust"
 cuantosClusters=3
-solucionJerarquica1 <- eclust(df.scaled1, 
+solucionJerarquica1 <- eclust(df1.scaled, 
                               FUNcluster =algoritmo,
                               k = cuantosClusters,
                               method = "complete", # como en nb!
@@ -183,7 +183,7 @@ df.scaled2 = scale(df,center=medians,scale=mads)
 ```{r, eval=FALSE}
 algoritmo="kmeans"
 cuantosClusters=3
-solucionKmeans1 <- eclust(df.scaled1, 
+solucionKmeans1 <- eclust(df1.scaled, 
                               FUNcluster =algoritmo,
                               k = cuantosClusters, # como en nb!
                               graph = FALSE) 
