@@ -5,7 +5,8 @@
 ### Prof. José Manuel Magallanes, PhD 
 ____
 ## **Análisis Multivariado**
-## Técnicas Descriptivas y Exploratorias (Parte III)
+
+## Exploración Dimensional
 ____
 
 <a id='beginning'></a>
