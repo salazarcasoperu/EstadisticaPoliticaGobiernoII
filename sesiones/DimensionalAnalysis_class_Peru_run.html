@@ -391,7 +391,7 @@ prop.table(tablaTE)</code></pre>
 ##  replicates)
 ## 
 ## data:  tablaTE
-## X-squared = 18.042, df = NA, p-value = 0.02749</code></pre>
+## X-squared = 18.042, df = NA, p-value = 0.02599</code></pre>
 <p>Si el valor del <strong>p-value</strong> es menor a <strong>0.05</strong>, se asume que hay asociación (formalmente estamos rechanzando la hipotesis nula: “la variables son independientes”).</p>
 <p>Hasta aqui sabemos que las variables están relacionadas, pero no tenemos mayor detalle de cómo es esa relación. Es aquí donde aparece el <strong>análisis de correspondencias</strong>. Éste es un análisis gráfico que permite conocer como se están asociando las categorías.</p>
 <p>Se comienza por calcular la tabla de correspondencias, a partir de la tabla de contingencia:</p>
@@ -726,7 +726,7 @@ Poly_cor &lt;- polychoric(subTable)$rho</code></pre>
 ## 
 ## $df
 ## [1] 276</code></pre>
-<p>Con esta información podemos saber si nuestras variables qué variables están familiarizadas y diferenciadas:</p>
+<p>Con esta información podemos saber qué variables están familiarizadas y diferenciadas:</p>
 <pre class="r"><code>resultadoPr=principal(Poly_cor,3,rotate=&quot;varimax&quot;, scores=T)
 print(resultadoPr,digits=3,cut = 0.4)</code></pre>
 <pre><code>## Principal Components Analysis

@@ -363,7 +363,7 @@ Poly_cor &lt;- polychoric(subTable)$rho</code></pre>
 <li>Verificar que la matriz de correlaciones que hemos calculado NO sea la matriz de identidad:</li>
 </ol>
 <pre class="r"><code>cortest.bartlett(Poly_cor, n=nrow(subTable))</code></pre>
-<p>Con esta información podemos saber si nuestras variables qué variables están familiarizadas y diferenciadas:</p>
+<p>Con esta información podemos saber qué variables están familiarizadas y diferenciadas:</p>
 <pre class="r"><code>resultadoPr=principal(Poly_cor,3,rotate=&quot;varimax&quot;, scores=T)
 print(resultadoPr,digits=3,cut = 0.4)</code></pre>
 <p><a href="#beginning">Inicio</a></p>

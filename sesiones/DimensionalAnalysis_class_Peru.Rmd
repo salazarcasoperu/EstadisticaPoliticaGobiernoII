@@ -412,7 +412,7 @@ KMO(Poly_cor)  #MSA: al menos 0.60, 0.9 es buenisimo.
 cortest.bartlett(Poly_cor, n=nrow(subTable))
 ```
 
-Con esta información podemos saber si nuestras variables qué variables están familiarizadas y diferenciadas:
+Con esta información podemos saber qué variables están familiarizadas y diferenciadas:
 
 ```{r, eval=FALSE}
 resultadoPr=principal(Poly_cor,3,rotate="varimax", scores=T)
