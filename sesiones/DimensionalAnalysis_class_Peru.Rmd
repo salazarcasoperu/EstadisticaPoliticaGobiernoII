@@ -424,6 +424,12 @@ print(resultadoPr,digits=3,cut = 0.4)
 regresFactors=factor.scores(subTable,resultadoPr)$scores
 ```
 
+
+
+
+
+
+
 [Inicio](#beginning)
 
 ______
