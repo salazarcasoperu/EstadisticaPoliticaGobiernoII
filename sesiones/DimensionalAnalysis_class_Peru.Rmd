@@ -298,7 +298,7 @@ dataSpss=read_sav(fileToRead)
 ```
 
 Tenemos la data, como viene de encuesta, preguntemos cuantas columnas hay:
-```{r}
+```{r, eval=FALSE}
 ncol(dataSpss)
 ```
 
@@ -309,12 +309,12 @@ Veamos un primer conjunto de preguntas (B1-B47A):
 ![](lapopB.jpg)
 
 Dónde estarán esas variables entre las 208 que tenemos?
-```{r}
+```{r, eval=FALSE}
 grep("b", colnames(dataSpss) )
 ```
 
 Como deben ser consecutivos, veamos que hay de la columna 56 a la 73:
-```{r}
+```{r, eval=FALSE}
 colnames(dataSpss)[c(56:73)]
 ```
 
@@ -323,7 +323,7 @@ Aqui tenemos otro:
 
 ![](lapopN.jpg)
 
-```{r}
+```{r, eval=FALSE}
 # solo son 3:
 labelsCol1=c('n9','n11','n15')
 which(names(dataSpss)%in%labelsCol1)
@@ -335,95 +335,96 @@ Y un tercer grupo:
 
 Hacemos lo mismo:
 
-```{r}
+```{r, eval=FALSE}
 # solo son 3:
 labelsCol2=c('pr3a','pr3b','pr3c','pr4')
 which(names(dataSpss)%in%labelsCol2)
 ```
 
-```{r}
+Ya sabemos cuáles son las columnas que queremos, pues procedemos a subsetear:
+
+```{r, eval=FALSE}
 set1=c(56:73)
 set2=which(names(dataSpss)%in%labelsCol1)
 set3=which(names(dataSpss)%in%labelsCol2)
 #
 columnasQueNecesito=c(set1,set2 ,set3)
-columnasQueNecesito
-```
-
-Ahora si subconjunto:
-```{r}
 sub_dataSpss=dataSpss[,columnasQueNecesito]
+
+# ver:
+head(sub_dataSpss)
 ```
 
 Nos indican más arriba que no debemos aplicar la pregunta _b33_ a los de Lima. Será mejor eliminar esa columna:
 
-```{r}
+```{r, eval=FALSE}
+# cual es la columna?
 which(names(sub_dataSpss)%in%'b33')
 ```
 
 Esa es la columna que necesitamos eliminar:
-```{r}
+
+```{r, eval=FALSE}
 sub_dataSpss=sub_dataSpss[,-16]
 ```
 
-Ahora si lo usual:
-```{r}
-subTable=data.frame(sub_dataSpss)
-```
+Ahora sí, lo usual:
 
-```{r}
+```{r, eval=FALSE}
+# asegurarse que es data frame:
+subTable=data.frame(sub_dataSpss)
+
+# ver tipo de datos
 str(subTable)
 ```
 
-Una descripción:
-```{r}
+Ver valores:
+```{r, eval=FALSE}
 summary(subTable,maxsum = 8)
 ```
 
-Ahora hay que reemplazar esos valores perdidos:
-```{r}
-for(i in 1:ncol(subTable)){
-  subTable[is.na(subTable[,i]), i] <- median(subTable[,i], na.rm = TRUE)
+Ahora hay que reemplazar esos valores perdidos, como son data ordinal, debemos usar la mediana:
+```{r, eval=FALSE}
+for(i in 1:ncol(subTable)){  # para cada columna:
+  MEDIANA=median(subTable[,i], na.rm = TRUE) # calcula la mediana de esa columna
+  subTable[is.na(subTable[,i]), i] <- round(MEDIANA,0) # pon la mediana donde haya un NA en esa columna (redondeada)
 }
 ```
 
+Ya tenemos tres conjuntos de variables sin valores perdidos, aquí debemos hallar una matriz de correlación. Sin embargo, considerando, dado que los datos son ordinales, debemos usar la matriz policórica (en vez de la de correlación lineal de Pearson):
 
-Ya tenemos tres conjuntos de variables, aqui debemos hallar una matriz de correlación. Sin embargo, considerando, dado que los datos son ordinales, debemos usarhallar la matriz policórica (en vez de la de correlación lineal de Pearson):
-```{r}
+```{r, eval=FALSE}
 library(psych)
 Poly_cor <- polychoric(subTable)$rho
 ```
 
-El tamaño de la muestra es el adecuado?
+Hasta aquí todo marcha bien. Lo que queremos ver es si nuestros conjuntos de preguntas representaban conceptos bien diferenciados. Y esto sigue esta logica:
 
-```{r}
+1) Saber si el tamaño de la muestra es el adecuado:
+
+```{r, eval=FALSE}
 KMO(Poly_cor)  #MSA: al menos 0.60, 0.9 es buenisimo.
 ```
 
-Un tema importante, si vamos a trabajar con correlaciones, es saber si esta no es la matriz de identidad:
+2) Verificar que la matriz de correlaciones que hemos calculado NO sea la matriz de identidad:
 
-```{r}
+```{r, eval=FALSE}
 cortest.bartlett(Poly_cor, n=nrow(subTable))
 ```
 
+Con esta información podemos saber si nuestras variables qué variables están familiarizadas y diferenciadas:
 
-```{r}
-smc(Poly_cor,covar = T)
-```
-
-```{r}
+```{r, eval=FALSE}
 resultadoPr=principal(Poly_cor,3,rotate="varimax", scores=T)
 print(resultadoPr,digits=3,cut = 0.4)
 ```
 
 
-```{r}
+```{r, echo=FALSE, eval=FALSE}
 regresFactors=factor.scores(subTable,resultadoPr)$scores
 ```
 
 [Inicio](#beginning)
-
-La idea es crear sólo quedarnos con esos grupos por ahora:
 
 ______
 

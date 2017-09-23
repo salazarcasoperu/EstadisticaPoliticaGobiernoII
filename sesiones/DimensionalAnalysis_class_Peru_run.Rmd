@@ -16,10 +16,7 @@ Carguemos la data:
 folder='data'
 fileName='idePeru2012.csv'
 fileToRead=file.path(folder,fileName)
-ide12=read.csv(fileToRead,strip.white = T,
-                 colClasses=c(rep('character',4),
-                              rep('numeric',7),
-                              rep('factor',3)))
+ide12=read.csv(fileToRead,strip.white = T)
 ```
 
 Veamos estructura:
@@ -285,7 +282,147 @@ Para ver los angulos podemos pedir:
 plot.ca(tablaCA_te, col=c("red","blue"), arrows = c(T,T))
 ```
 
+## Buscando estructura 
 
+Muchas veces nos enfrentamos a _conjuntos_ de preguntas que desean consultar sobre un mismo tema. Ese mismo tema es una variable _latente_, la cuál es un concepto abstracto dificilmente visto de manera empírica, por lo que usaremos variables _observables_ para acercarnos a su comprensión.
+
+Una primera técnica que lidia con esto es el análisis de componentes principales (**PCA** por sus siglas en inglés). El PCA simplemente va a reducir las preguntas y devolver menos dimensiones (en eso se parece a lo visto antes), la diferencia es que ahora lo usaremos con variables ordinales.
+
+Traigamos una data de LAPOP:
+
+```{r, eval=TRUE}
+library(haven)
+fileName='PeruLAPOP2014.sav'
+fileToRead=file.path(folder,fileName)
+dataSpss=read_sav(fileToRead)
+```
+
+Tenemos la data, como viene de encuesta, preguntemos cuantas columnas hay:
+```{r, eval=TRUE}
+ncol(dataSpss)
+```
+
+
+Con esta cantidad de columnas no vale la pena verlas todas aquí, pues lo que necesitamos es algunos conjuntos de variables que buscan un concepto. 
+
+Veamos un primer conjunto de preguntas (B1-B47A):
+![](lapopB.jpg)
+
+Dónde estarán esas variables entre las 208 que tenemos?
+```{r, eval=TRUE}
+grep("b", colnames(dataSpss) )
+```
+
+Como deben ser consecutivos, veamos que hay de la columna 56 a la 73:
+```{r, eval=TRUE}
+colnames(dataSpss)[c(56:73)]
+```
+
+
+Aqui tenemos otro:
+
+![](lapopN.jpg)
+
+```{r, eval=TRUE}
+# solo son 3:
+labelsCol1=c('n9','n11','n15')
+which(names(dataSpss)%in%labelsCol1)
+```
+
+Y un tercer grupo:
+
+![](lapopPR.jpg)
+
+Hacemos lo mismo:
+
+```{r, eval=TRUE}
+# solo son 3:
+labelsCol2=c('pr3a','pr3b','pr3c','pr4')
+which(names(dataSpss)%in%labelsCol2)
+```
+
+Ya sabemos cuáles son las columnas que queremos, pues procedemos a subsetear:
+
+```{r, eval=TRUE}
+set1=c(56:73)
+set2=which(names(dataSpss)%in%labelsCol1)
+set3=which(names(dataSpss)%in%labelsCol2)
+#
+columnasQueNecesito=c(set1,set2 ,set3)
+sub_dataSpss=dataSpss[,columnasQueNecesito]
+
+# ver:
+head(sub_dataSpss)
+```
+
+Nos indican más arriba que no debemos aplicar la pregunta _b33_ a los de Lima. Será mejor eliminar esa columna:
+
+```{r, eval=TRUE}
+# cual es la columna?
+which(names(sub_dataSpss)%in%'b33')
+```
+
+Esa es la columna que necesitamos eliminar:
+
+```{r, eval=TRUE}
+sub_dataSpss=sub_dataSpss[,-16]
+```
+
+Ahora sí, lo usual:
+
+```{r, eval=TRUE}
+# asegurarse que es data frame:
+subTable=data.frame(sub_dataSpss)
+
+# ver tipo de datos
+str(subTable)
+```
+
+Ver valores:
+```{r, eval=TRUE}
+summary(subTable,maxsum = 8)
+```
+
+Ahora hay que reemplazar esos valores perdidos, como son data ordinal, debemos usar la mediana:
+```{r, eval=TRUE}
+for(i in 1:ncol(subTable)){  # para cada columna:
+  MEDIANA=median(subTable[,i], na.rm = TRUE) # calcula la mediana de esa columna
+  subTable[is.na(subTable[,i]), i] <- round(MEDIANA,0) # pon la mediana donde haya un NA en esa columna (redondeada)
+}
+```
+
+Ya tenemos tres conjuntos de variables sin valores perdidos, aquí debemos hallar una matriz de correlación. Sin embargo, considerando, dado que los datos son ordinales, debemos usar la matriz policórica (en vez de la de correlación lineal de Pearson):
+
+```{r, eval=TRUE}
+library(psych)
+Poly_cor <- polychoric(subTable)$rho
+```
+
+Hasta aquí todo marcha bien. Lo que queremos ver es si nuestros conjuntos de preguntas representaban conceptos bien diferenciados. Y esto sigue esta logica:
+
+1) Saber si el tamaño de la muestra es el adecuado:
+
+```{r, eval=TRUE}
+KMO(Poly_cor)  #MSA: al menos 0.60, 0.9 es buenisimo.
+```
+
+2) Verificar que la matriz de correlaciones que hemos calculado NO sea la matriz de identidad:
+
+```{r, eval=TRUE}
+cortest.bartlett(Poly_cor, n=nrow(subTable))
+```
+
+Con esta información podemos saber si nuestras variables qué variables están familiarizadas y diferenciadas:
+
+```{r, eval=TRUE}
+resultadoPr=principal(Poly_cor,3,rotate="varimax", scores=T)
+print(resultadoPr,digits=3,cut = 0.4)
+```
+
+
+```{r, echo=FALSE, eval=FALSE}
+regresFactors=factor.scores(subTable,resultadoPr)$scores
+```
 
 [Inicio](#beginning)
 
