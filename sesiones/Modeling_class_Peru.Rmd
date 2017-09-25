@@ -1,0 +1,262 @@
+<br> 
+<center><img src="http://i.imgur.com/tveTlt8.png" width="300"></center>
+
+## Course: Estadística Para el Análisis Político II<br> Semestre 2017-II<br> 
+### Prof. José Manuel Magallanes, PhD 
+____
+## **Análisis Multivariado**
+
+## Modelamiento y Técnicas Predictivas (Datos de corte tranversal)
+____
+
+<a id='beginning'></a>
+
+
+
+```{r, eval=FALSE, echo=FALSE}
+library(readxl)
+fileName='idhPeru.xlsx'
+fileToRead=file.path(folder,fileName)
+dataExcel=read_excel(fileToRead)
+head(dataExcel)
+```
+
+
+
+
+
+
+Carguemos la data:
+```{r, eval=FALSE}
+folder='data'
+fileName='idh_elec.csv'
+fileToRead=file.path(folder,fileName)
+idh_elec=read.csv(fileToRead,strip.white = T,
+                  stringsAsFactors = F)
+```
+
+Como antes revisemos que TIPO de data tenemos:
+
+```{r, eval=FALSE}
+str(idh_elec)
+```
+
+La data tiene los componentes del IDH calculados por distrito el año 2012. Así mismo, tenemos los votos para PPK y KEIKO durante la segunda vuelta del 2016. Veamos qué podemos preguntarnos con técnicas multivariadas.
+
+```{r, eval=FALSE}
+idh_elec$ganappk=as.factor(ifelse(idh_elec$PPK>idh_elec$FP,1,0))
+levels(idh_elec$ganappk)=c('Keiko','PPK')
+```
+
+
+## Buscando explicaciones
+
+Si quisieramos saber cómo están relacionados los resultados electorales con el idh, necesitamos hacer una regresión.
+Primero, creemos un subconjunto:
+
+```{r, eval=FALSE}
+test=idh_elec[,c('ganappk','esperanza','secundaria','tiempoedu','percapitaf')]
+aggregate(cbind(esperanza,secundaria,tiempoedu,percapitaf) ~ ganappk, data=test,FUN=mean)
+```
+
+
+Exploremos esos grupos con más detalle:
+
+```{r, eval=FALSE}
+par(mfrow=c(2,2))
+boxplot(esperanza ~ ganappk, data=test,main='esperanza de vida')
+boxplot(secundaria ~ ganappk, data=test,main='secundaria')
+boxplot(tiempoedu ~ ganappk, data=test,main='años de educación')
+boxplot(percapitaf ~ ganappk, data=test,main='percapita familiar')
+
+```
+
+
+
+Aqui proponemos un modelo:
+
+
+```{r, eval=FALSE}
+
+modeloDico <- glm(ganappk ~ ., 
+                 data = test, 
+                 family = "binomial")
+
+summary(modeloDico)
+```
+
+
+Los valores negativos indican que el aumento de esa variable disminuye la probabilidad de ganar para PPK, los positivos lo contrario. Otra manera de leerlo: 
+
+
+```{r, eval=FALSE}
+exp(coef(modeloDico))
+```
+Mientres mayor a 1, mayor la probabilidad de ganar, si es menor que 1, lo opuesto (la cercanía a cero insinúa ausencia de efecto).
+
+Lo anterior 'modelaba' la respuesta dicotómica _gana ppk_, pero si tuvieramos una variable de conteo?
+```{r, eval=FALSE}
+hist(idh_elec$PPK) # votos de PPK
+```
+
+Lo razonable sería:
+
+```{r, eval=FALSE}
+test2=idh_elec[,c('PPK','esperanza','secundaria','tiempoedu','percapitaf')]
+##
+library(MASS)
+modeloCount=glm.nb(PPK ~ ., data= test2)
+summary(modeloCount)
+```
+
+Ahora, si dividiésemos el conteo de votos entre la población, la razón encontrada nos da una _medición_:
+
+```{r, eval=FALSE}
+idh_elec$PPKpob=idh_elec$PPK/idh_elec$pobla
+hist(idh_elec$PPKpob)
+```
+```{r, eval=FALSE}
+test3=idh_elec[,c('PPKpob','esperanza','secundaria','tiempoedu','percapitaf')]
+plot(test3) #aparecen relaciones lineales?
+```
+
+Un modelo podría ser:
+
+```{r, eval=FALSE}
+modeloMedida <- glm(PPKpob ~ ., 
+                 data = test3, 
+                 family = gaussian)
+
+summary(modeloMedida)
+```
+
+Sin embargo, dada la distribución de la densidad, el comportamiento de los residuos no se ajustará bien (se esperaba normalidad):
+```{r, eval=FALSE}
+qqnorm(residuals(modeloMedida))
+abline(a=0,b=1)
+```
+
+Calculemos ahora las diferencias entre ambos, y veamos cómo se distribuyem éstas:
+
+```{r, eval=FALSE}
+idh_elec$PPKdif=idh_elec$PPK-idh_elec$FP # calculando
+hist(idh_elec$PPKdif)  # viendo distribución
+```
+
+Tal distribución la podemos recodificar:
+
+```{r, eval=FALSE}
+
+idh_elec$PPKdif_O=ifelse(idh_elec$PPKdif==0,3,
+                         ifelse(idh_elec$PPKdif<0,2,4))
+
+idh_elec$PPKdif_O=ifelse(idh_elec$PPKdif<(-5000),1,idh_elec$PPKdif_O)
+idh_elec$PPKdif_O=ifelse(idh_elec$PPKdif>5000,5,idh_elec$PPKdif_O)
+
+# eso nos da:
+table(idh_elec$PPKdif_O)
+```
+
+Démosle formato a esa variable:
+
+```{r, eval=FALSE}
+theLevels=c(1,2,3,4,5)
+theLabels=c('pierdeMal','pierde','empata','gana','ganaBien')
+idh_elec$PPKdif_O=factor(idh_elec$PPKdif_O,
+                         levels=theLevels,
+                         labels = theLabels,
+                         ordered=T)
+
+# visualizando:
+barplot(table(idh_elec$PPKdif_O))
+```
+
+Como antes, creemos un subconjunto de datos:
+
+```{r, eval=FALSE}
+test4=idh_elec[,c('PPKdif_O','esperanza','secundaria','tiempoedu','percapitaf')]
+```
+
+Teniendo a la variable ordinal como la _Y_, veamos que sucede:
+
+```{r, eval=FALSE}
+library(ordinal)
+modelOrdi <- clm(PPKdif_O ~ ., data=test4)
+summary(modelOrdi)
+```
+
+Con:
+```{r, eval=FALSE}
+100*(exp(modelOrdi$beta)-1)
+```
+
+Si deseamos evitar el mensaje _warning_ anterior:
+
+```{r, eval=FALSE}
+test4s=test4
+test4s[,c(2:5)]=scale(test4s[,c(2:5)])
+
+## usando normalización
+modelOrdi_scaled <- update(modelOrdi,data=test4s)
+summary(modelOrdi_scaled)
+```
+
+```{r, eval=FALSE}
+100*(exp(modelOrdi_scaled$beta)-1)
+```
+
+
+```{r, echo=FALSE, eval=FALSE}
+library(MASS)
+modelOrd=polr(PPKdif_O ~ ., data=test4, Hess=TRUE)
+summary(modelOrd)
+modelOrd.coef <- data.frame(coef(summary(modelOrd)))
+modelOrd.coef$pval = round((pnorm(abs(modelOrd.coef$t.value), lower.tail = FALSE) * 2),2)
+modelOrd.coef
+
+modelOrd.or=exp(coef(modelOrd))
+(modelOrd.or-1)*100
+
+library(erer)
+modelOrd_mg<- ocME(w=modelOrd)
+modelOrd_mg$out
+
+
+#library(margins)
+#margins(modelOrdi_scaled)  #just glm
+```
+
+Finalmente, veamos esta otra data:
+
+```{r}
+library(openxlsx)
+
+fileName='eg2006v1.xlsx'
+fileToRead=file.path(folder,fileName)
+data06=read.xlsx(fileToRead)
+head(data06)
+```
+```{r}
+str(data06)
+```
+```{r}
+data06_wide <- reshape(data06, idvar = c("ubigeo","region"),
+                       timevar = "partido", direction = "wide")
+data06_wide
+```
+```{r}
+wide <- reshape(Indometh, v.names = "conc", idvar = "Subject",
+                timevar = "time", direction = "wide")
+wide
+```
+
+
+[Inicio](#beginning)
+
+
+______
+
+
+<br></br>
+
+####[VOLVER AL SILABO](https://inteligenciaperu.github.io/Estadistica/)
