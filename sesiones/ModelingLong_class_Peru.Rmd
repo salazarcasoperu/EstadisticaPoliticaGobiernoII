@@ -1,0 +1,18 @@
+```{r}
+library(foreign)
+Panel <- read.dta("http://dss.princeton.edu/training/Panel101.dta")
+```
+```{r}
+Panel
+```
+
+```{r}
+coplot(y ~ year|country, type="l", data=Panel) # Lines
+#coplot(y ~ year|country, type="b", data=Panel) # Points and lines
+```
+
+```{r}
+library(car)
+scatterplot(y~year|country, boxplots=FALSE, smooth=TRUE, reg.line=FALSE, data=Panel)
+```
+
