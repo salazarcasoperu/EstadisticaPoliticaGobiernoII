@@ -21,7 +21,7 @@ idh_elec=read.csv(fileToRead,strip.white = T,
                   stringsAsFactors = F)
 ```
 
-Como antes revisemos que TIPO de data tenemos:
+Como antes revisemos qué TIPO de data tenemos:
 
 ```{r, eval=TRUE}
 str(idh_elec)

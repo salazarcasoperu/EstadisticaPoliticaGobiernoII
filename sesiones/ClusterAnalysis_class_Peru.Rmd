@@ -1,192 +1,33 @@
 <br> 
 <center><img src="http://i.imgur.com/tveTlt8.png" width="300"></center>
 
-## Course: Estadística Para el Análisis Político II<br> Semestre 2017-II<br> 
+## Curso: Estadística Para el Análisis Político II<br> Semestre 2017-II<br> 
 ### Prof. José Manuel Magallanes, PhD 
 ____
 ## **Análisis Multivariado**
-## Técnicas Descriptivas y Exploratorias (Parte I)
+## Técnicas Descriptivas y Exploratorias Multivariadas (Parte I)
 ____
 
 <a id='beginning'></a>
 
-Análizar conglomerados es un proceso complejo. Sobre todo pues los datos deben estar bien entendidos y el propósito del estudio bastante claro para saber qué camino tomar.
 
-Nuestro interés está, en este caso, en los datos del Indice de Densidad del Estado que tuvo a bien crear el PNUD. Estos datos están en Excel, lo cual no sería mayor problema, sino fuera por qué las hojas tienen títulos innecsarios para nuestro análisis. Veamos la data de la primera hoja, que corresponde a este índice para el 2012:
+En este curso trabajaremos técnicas multivariadas. Lo complejo es justamente la cantidad de variables que intervienen y que requieren muchas veces mucho tratamiento. La mayoría de programas estadísticos (SPSS, STATA, R, etc.) tiene diversas funciones que ayudan a alistar los datos necesarios cuando se tienen muchas variables involucradas. **Esto no era así cuando sólo se trabajaban con dos variables**. **R** es muy versatil para preparar los datos para el análisis multivariado. Usted puede utilizar otro software, como **EXCEL**, para alistarlos, pero si la cantidad de datos es numerosa, pronto encontrará que son muy limitados. 
 
-```{r, eval=FALSE}
-library(openxlsx)
-folder='data'
-fileName='idePeru.xlsx'
-fileToRead=file.path(folder,fileName)
-cualHoja=1
-datos<- read.xlsx(fileToRead, cualHoja)
-head(datos,10)
-```
+## AGRUPANDO LAS UNIDADES DE ESTUDIO
 
-**Openxlsx** es muy eficiente, pues inclusive omite columnas vacías. Sin embargo, vemos que la data no inicia donde debe, los titulos no corresponden a las columnas; y, aunque que las Provincias figuran en cada fila, los Departamentos no están en las filas, sino como titulos para las provincias (y encima no hay distritos, aunque la hoja muestra ese nombre). Arreglemos esto.
+En general, las tablas de datos se estructuran como una colección de filas (casos o unidades de estudio) y columnas (variables). En este caso, nos interesa agrupar las unidades de estudio (filas). Para este caso, utilizaremos la data creada por el *PNUD*, el Indice de Densidad del Estado. Este índice es producto de combinar otras variables. 
 
+La data original del IDE-PNUD está en Excel, lo cual no sería mayor problema, sino fuera por que las _hojas_ tienen varios elementos innecesarios para nuestro análisis. Esta data necesita ser tratada para dejarla lista para el análisis multivariado. Este proceso está descrito más abajo, siga este [link](#cleaning) para revisarlo.
 
-```{r, eval=FALSE}
-filaInicial=4
-datos=read.xlsx(fileToRead, 
-                sheet = 1, 
-                startRow = filaInicial, 
-                skipEmptyRows = TRUE, skipEmptyCols = TRUE)
-```
+La data preparada para ser analizada
 
-Los reportes de este tipo sueles añadir información innecesaria al final, verifiquemos:
-
-```{r, eval=FALSE}
-tail(datos,10)
-```
-
-La data acaba en la fila 222, con la provincia de Purus. Eliminemos filas innecesarias:
-
-```{r, eval=FALSE}
-datos=datos[-c(223:226),]
-```
-
-El encabezado aun tiene problemas:
-```{r, eval=FALSE}
-head(datos)
-```
-
-Las filas 1 al 3 nos innecesarias:
-
-```{r, eval=FALSE}
-datos=datos[-c(1:3),]
-```
-
-Separemos y guardemos los nombres de regiones y sus codigos (ubigeos) :
-```{r, eval=FALSE}
-queColumnas=c(1,2)
-regiones=datos[,queColumnas]
-head(regiones,10)
-```
-Podemos quedarnos con los casos completos por fila:
-```{r, eval=FALSE}
-regiones=regiones[complete.cases(regiones),]
-head(regiones,10)
-```
-
-Cambiemos nombres:
-```{r, eval=FALSE}
-nombresNuevos=c('regionUbigeo','regionNombre')
-names(regiones)=nombresNuevos
-head(regiones)
-```
-
-De igual manera, guardemos la info de las provincias:
-```{r, eval=FALSE}
-queColumnas=c(2)
-provincias=datos[,-queColumnas]
-head(provincias,10)
-```
-
-Veamos que columnas tenemos:
-```{r, eval=FALSE}
-names(provincias)
-```
-
-X1 y X3 son necesarias. Eliminemos todas las otras que comiencen con X (los rankings):
-
-```{r, eval=FALSE}
-dejandoUno=seq(4,16,2) # 4,6,8, etc.
-queColumnas=c(dejandoUno)
-provincias=provincias[,-queColumnas]
-head(provincias,10)
-```
-
-Nuevamente, podemos quedarnos con los casos completos por fila:
-```{r, eval=FALSE}
-provincias=provincias[complete.cases(provincias),]
-head(provincias,10)
-```
-
-Renombremos las dos primeras columnas
-```{r, eval=FALSE}
-names(provincias)[c(1,2)]=c('provinciaUbigeo','provinciaNombre')
-head(provincias)
-```
-
-Con la misma lógica, simplifiquemos los otros nombres de columnas:
-```{r, eval=FALSE}
-names(provincias)
-```
-
-```{r, eval=FALSE}
-names(provincias)[c(3:9)]=c('pob2012','ide2012','identificacion2012','medicos2012','escolaridad2012','AguaDesague2012','electrificacion2012')
-head(provincias)
-```
-
-Podriamos calcular la media de la población:
-```{r, eval=FALSE}
-mean(provincias$pob2012)
-```
-
-Si aplicas una función numérica, y sale error, es por que quizas los datos tengan problemas:
-```{r, eval=FALSE}
-str(provincias)
-```
-
-Las funciones numéricas no pueden aplicarse a los textos ('chr'), por ende:
-```{r, eval=FALSE}
-provincias[,c(3:9)]=lapply(provincias[,c(3:9)],as.numeric)
-str(provincias)
-```
-Ahora si funciona:
-```{r, eval=FALSE}
-mean(provincias$pob2012)
-```
-
-Podemos ahora crear la columna _regionUbigeo_, usando _provinciaUbigeo_; sólo hay que quedarnos con los dos (2) primeros digitos de esa columna (nótese que están como texto).
-```{r, eval=FALSE}
-#primero la duplicamos pero con otro nombre (por defecto nueva columna va al final)
-provincias$regionUbigeo=provincias$provinciaUbigeo
-```
-
-A la nueva columna le reemplazamos con '0000' todo valor luego de los primeros dos digitos:
-```{r, eval=FALSE}
-substr(provincias$regionUbigeo,3,6)='0000'
-```
-
-Podemos reubicar la posición de la última columna:
-```{r, eval=FALSE}
-# jugando con la posiciones:
-provincias=provincias[,c(10,1:9)] 
-```
-
-Tenemos entonces:
-```{r, eval=FALSE}
-head(provincias,10)
-```
-
-Hagamos el '_merge_', entre los datos de **regiones** y **provincias**:
-```{r, eval=FALSE}
-provinciasNew=merge(provincias,regiones,by.x = 'regionUbigeo',
-                    by.y='regionUbigeo',
-                    all.x = TRUE) # Esto detecta si alguna provincia no encontró Region.
-```
-
-Si el merge salió bien, provincias tendrá una nueva columna (al final) con el nombre de la Región:
-```{r, eval=FALSE}
-names(provinciasNew)
-```
-
-
-Movamos de posición esa columna nueva:
-```{r, eval=FALSE}
-provinciasNew=provinciasNew[,c(1:2,11,3:10)]
-```
-
-Asi quedó:
-
-```{r, eval=FALSE}
-head(provinciasNew)
-```
 
 Muy bien. Ahora comencemos a pensar en los conglomerados.
+
+```{r, echo=FALSE, eval=FALSE}
+write.xlsx(provinciasNew,"data/IDE_limpio.xlsx")
+```
+
 
 La idea es super simple, queremos, en este caso, saber que provincias son lo sufientemente similares entre sí para decir que forman un grupo homogeneo o conglomerado. Lo atractivo, en este caso, es que podemos usar muchas características de las provincias (esta es una técnica multivariada) para agruparlas. Una limitación a tener en cuenta, es que la técnica de conglomerados que veremos está limitada a variables numéricas.
 
@@ -367,3 +208,192 @@ sil[neg_sil_index, , drop = FALSE]
 ```
 
 
+<a id='cleaning'></a>
+
+## Preparación de la data multivariada
+
+La data original es esta en el archivo "idePeru.xlsx" que lo puede descargar de [aquí](https://github.com/PoliticayGobiernoPUCP/EstadisticaPoliticaGobiernoII/raw/master/sesiones/data/idhPeru.xlsx).
+
+Descargue la data y guardela en la carpeta _data_. Desde ahí comience a trabajar:
+
+```{r, eval=FALSE}
+library(openxlsx)
+folder='data'
+fileName='idePeru.xlsx'
+fileToRead=file.path(folder,fileName)
+cualHoja=1
+datos<- read.xlsx(fileToRead, cualHoja)
+head(datos,10)
+```
+
+**Openxlsx** es muy eficiente, pues inclusive omite columnas vacías. Sin embargo, vemos que la data no inicia donde debe, los titulos no corresponden a las columnas; y, aunque que las Provincias figuran en cada fila, los Departamentos no están en las filas, sino como titulos para las provincias (y encima no hay distritos, aunque la hoja muestra ese nombre). Arreglemos esto.
+
+
+```{r, eval=FALSE}
+filaInicial=4
+datos=read.xlsx(fileToRead, 
+                sheet = 1, 
+                startRow = filaInicial, 
+                skipEmptyRows = TRUE, skipEmptyCols = TRUE)
+```
+
+Los reportes de este tipo sueles añadir información innecesaria al final, verifiquemos:
+
+```{r, eval=FALSE}
+tail(datos,10)
+```
+
+La data acaba en la fila 222, con la provincia de Purus. Eliminemos filas innecesarias:
+
+```{r, eval=FALSE}
+datos=datos[-c(223:226),]
+```
+
+El encabezado aun tiene problemas:
+```{r, eval=FALSE}
+head(datos)
+```
+
+Las filas 1 al 3 nos innecesarias:
+
+```{r, eval=FALSE}
+datos=datos[-c(1:3),]
+```
+
+Separemos y guardemos los nombres de regiones y sus codigos (ubigeos) :
+```{r, eval=FALSE}
+queColumnas=c(1,2)
+regiones=datos[,queColumnas]
+head(regiones,10)
+```
+Podemos quedarnos con los casos completos por fila:
+```{r, eval=FALSE}
+regiones=regiones[complete.cases(regiones),]
+head(regiones,10)
+```
+
+Cambiemos nombres:
+```{r, eval=FALSE}
+nombresNuevos=c('regionUbigeo','regionNombre')
+names(regiones)=nombresNuevos
+head(regiones)
+```
+
+De igual manera, guardemos la info de las provincias:
+```{r, eval=FALSE}
+queColumnas=c(2)
+provincias=datos[,-queColumnas]
+head(provincias,10)
+```
+
+Veamos que columnas tenemos:
+```{r, eval=FALSE}
+names(provincias)
+```
+
+X1 y X3 son necesarias. Eliminemos todas las otras que comiencen con X (los rankings):
+
+```{r, eval=FALSE}
+dejandoUno=seq(4,16,2) # 4,6,8, etc.
+queColumnas=c(dejandoUno)
+provincias=provincias[,-queColumnas]
+head(provincias,10)
+```
+
+Nuevamente, podemos quedarnos con los casos completos por fila:
+```{r, eval=FALSE}
+provincias=provincias[complete.cases(provincias),]
+head(provincias,10)
+```
+
+Renombremos las dos primeras columnas
+```{r, eval=FALSE}
+names(provincias)[c(1,2)]=c('provinciaUbigeo','provinciaNombre')
+head(provincias)
+```
+
+Con la misma lógica, simplifiquemos los otros nombres de columnas:
+```{r, eval=FALSE}
+names(provincias)
+```
+
+```{r, eval=FALSE}
+names(provincias)[c(3:9)]=c('pob2012','ide2012','identificacion2012','medicos2012','escolaridad2012','AguaDesague2012','electrificacion2012')
+head(provincias)
+```
+
+Podriamos calcular la media de la población:
+```{r, eval=FALSE}
+mean(provincias$pob2012)
+```
+
+Si aplicas una función numérica, y sale error, es por que quizas los datos tengan problemas:
+```{r, eval=FALSE}
+str(provincias)
+```
+
+Las funciones numéricas no pueden aplicarse a los textos ('chr'), por ende:
+```{r, eval=FALSE}
+provincias[,c(3:9)]=lapply(provincias[,c(3:9)],as.numeric)
+str(provincias)
+```
+Ahora si funciona:
+```{r, eval=FALSE}
+mean(provincias$pob2012)
+```
+
+Podemos ahora crear la columna _regionUbigeo_, usando _provinciaUbigeo_; sólo hay que quedarnos con los dos (2) primeros digitos de esa columna (nótese que están como texto).
+```{r, eval=FALSE}
+#primero la duplicamos pero con otro nombre (por defecto nueva columna va al final)
+provincias$regionUbigeo=provincias$provinciaUbigeo
+```
+
+A la nueva columna le reemplazamos con '0000' todo valor luego de los primeros dos digitos:
+```{r, eval=FALSE}
+substr(provincias$regionUbigeo,3,6)='0000'
+```
+
+Podemos reubicar la posición de la última columna:
+```{r, eval=FALSE}
+# jugando con la posiciones:
+provincias=provincias[,c(10,1:9)] 
+```
+
+Tenemos entonces:
+```{r, eval=FALSE}
+head(provincias,10)
+```
+
+Hagamos el '_merge_', entre los datos de **regiones** y **provincias**:
+```{r, eval=FALSE}
+provinciasNew=merge(provincias,regiones,by.x = 'regionUbigeo',
+                    by.y='regionUbigeo',
+                    all.x = TRUE) # Esto detecta si alguna provincia no encontró Region.
+```
+
+Si el merge salió bien, provincias tendrá una nueva columna (al final) con el nombre de la Región:
+```{r, eval=FALSE}
+names(provinciasNew)
+```
+
+
+Movamos de posición esa columna nueva:
+```{r, eval=FALSE}
+provinciasNew=provinciasNew[,c(1:2,11,3:10)]
+```
+
+Asi quedó:
+
+```{r, eval=FALSE}
+head(provinciasNew)
+```
+
+
+
+```{r, echo=FALSE, eval=FALSE}
+write.xlsx(provinciasNew,"data/IDE_limpio.xlsx")
+```
+
+[ir al inicio de la página](#beginning)
+
+####[VOLVER AL SILABO](https://politicaygobiernopucp.github.io/EstadisticaPoliticaGobiernoII/)
