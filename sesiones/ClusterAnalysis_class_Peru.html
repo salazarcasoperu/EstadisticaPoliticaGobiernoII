@@ -142,32 +142,18 @@ $(document).ready(function () {
 <div id="agrupando-las-unidades-de-estudio" class="section level2">
 <h2>AGRUPANDO LAS UNIDADES DE ESTUDIO</h2>
 <p>En general, las tablas de datos se estructuran como una colección de filas (casos o unidades de estudio) y columnas (variables). En este caso, nos interesa agrupar las unidades de estudio (filas). Para este caso, utilizaremos la data creada por el <em>PNUD</em>, el Indice de Densidad del Estado. Este índice es producto de combinar otras variables.</p>
-<p>La data original del IDE-PNUD está en Excel, lo cual no sería mayor problema, sino fuera por que las <em>hojas</em> tienen varios elementos innecesarios para nuestro análisis. Esta data necesita ser tratada para dejarla lista para el análisis multivariado. Este proceso está descrito más abajo, siga este link para <a href="#cleaning">revisarlo</a>.</p>
-<p>La data preparada para ser analizada</p>
-<p>Muy bien. Ahora comencemos a pensar en los conglomerados.</p>
-<p>La idea es super simple, queremos, en este caso, saber que provincias son lo sufientemente similares entre sí para decir que forman un grupo homogeneo o conglomerado. Lo atractivo, en este caso, es que podemos usar muchas características de las provincias (esta es una técnica multivariada) para agruparlas. Una limitación a tener en cuenta, es que la técnica de conglomerados que veremos está limitada a variables numéricas.</p>
-<p>Antes que nada debemos cambiar el nombre de las filas:</p>
-<pre class="r"><code>head(provinciasNew)</code></pre>
-<p>Arriba, hay numeros en cada fila, ahora deben estar los nombres de las provincias, si es que no comparten el mismo nombre:</p>
-<pre class="r"><code>length(provinciasNew$provinciaNombre)==length(unique(provinciasNew$provinciaNombre))</code></pre>
-<p>Como no hay nombres repetidos:</p>
-<pre class="r"><code>row.names(provinciasNew)=provinciasNew$provinciaNombre
-head(provinciasNew)</code></pre>
-<p>Ya no están los numeros!</p>
-<p>Ahora exploremos las variables:</p>
-<pre class="r"><code>summary(provinciasNew)</code></pre>
-<p>La función <em>summary</em> de R no ayuda mucho para comparar los valores. Podemos crear nuestra propia función para explorar los datos:</p>
-<pre class="r"><code>df=provinciasNew[c(7:11)]
-descriptivos &lt;- data.frame(
-  Min = apply(df, 2, min), # minimum
-  Med = apply(df, 2, median), # median
-  Mean = apply(df, 2, mean), # mean
-  SD = apply(df, 2, sd), # Standard deviation
-  Max = apply(df, 2, max) # Maximum
-  )
-descriptivos &lt;- round(descriptivos, 1)
-head(descriptivos)</code></pre>
-<p>Estas son todas las variables numéricas (obviando población y el índice en sí), y nos damos cuenta que:</p>
+<p>La data original del IDE-PNUD está en Excel, lo cual no sería mayor problema, sino fuera por que las <em>hojas</em> tienen varios elementos innecesarios para nuestro análisis. Esta data necesita ser tratada para dejarla lista para el análisis multivariado. Este proceso está descrito más abajo, siga este <a href="#cleaning">link</a> para revisarlo.</p>
+<p>La data preparada para ser analizada podemos encontrarla en el archivo IDE_limpio.xlsx, descarguelo usando el link y guárdelo en la carpeta <em>data</em>. Desde ahí comience:</p>
+<pre class="r"><code>library(openxlsx)
+folder='data'
+fileName='IDE_limpio.xlsx'
+fileToRead=file.path(folder,fileName)
+provinciasNew=read.xlsx(fileToRead)</code></pre>
+<p>La idea es super simple, queremos, en este caso, saber qué provincias son lo sufientemente <strong>similares entre sí</strong> para decidir que formen un grupo homogeneo o conglomerado. Lo atractivo, en este caso, es que las múultiples variables que se tienen permiten darle un <strong>perfil</strong> particular a cada provincia, lo que permite <em>acercarlas</em> o <em>alejarlas</em> basandonos justamente en tal similitud. podemos usar muchas características de las provincias (esta es una técnica multivariada) para agruparlas.</p>
+<p>Veremos aquí una técnica de conglomeración conocidad como la <strong>jerárquica</strong>, limitaremos la aplicación a que multiples variables numéricas.</p>
+<p>Veamos que data tenemos, y de qué tipo son:</p>
+<pre class="r"><code>str(provinciasNew)</code></pre>
+<p>Las variables que nos interesan son:</p>
 <ul>
 <li>Población con acta nacimiento o DNI, es un <strong>porcentaje</strong>.</li>
 <li>Médicos por cada 10,000 habitantes, es una <strong>razón</strong>.</li>
@@ -176,53 +162,114 @@ head(descriptivos)</code></pre>
 </li>
 <li>Viviendas electrificadas, es un <strong>porcentaje</strong>.</li>
 </ul>
-<p>Por lo general, las características de las unidades de estudio (aqui Provincias) vienen con unidades de medición diferentes. Para que la técnica de comglomerados funcione adecuadamente, debemos llevar las variables a valores independientes de la unidad de medida:</p>
-<pre class="r"><code>df.scaled1 &lt;- scale(df)
-head(df.scaled1)</code></pre>
-<p>Una vez que los datos se han reescalado, debemos generar información sobre las similitudes o ‘distancias’ entre las filas basándonos en las columnas:</p>
-<pre class="r"><code>d1 &lt;- dist(df.scaled1)</code></pre>
-<p>En <em>d1</em> están las distancias, esto permite usar el algoritmo de conglomeración jerárquica.</p>
-<pre class="r"><code>d1.clusters=hclust(d1)</code></pre>
+<p>Hagamos el subconjunto de variables que necesitemos (de la columna 7 a la 11):</p>
+<pre class="r"><code>prov_sub=provinciasNew[c(7:11)]
+# vemos:
+head(prov_sub)</code></pre>
+<p>Estas variables son las que necesitan la función para llevar a cabo la técnica, pero hay que hacer algunos ajustes.</p>
+<ol style="list-style-type: decimal">
+<li>El subconjunto de la data no tiene como identificar a que caso corresponde cada fila. Aquí podemos usar el <em>ubigeo</em> o el <em>nombre</em> tal que reemplace los números que figuran a la izquierda de la data. El único requisito es que estos valores sean <strong>únicos</strong>. El ubigeo lo es, pero debemos verificar si el nombre de la provincia lo es:</li>
+</ol>
+<pre class="r"><code>numFilas=nrow(prov_sub)
+sinRepetir=length(unique(provinciasNew$provinciaNombre))
+numFilas==sinRepetir # si es TRUE, no hay repetidos</code></pre>
+<p>Como no hay nombres repetidos:</p>
+<pre class="r"><code>row.names(prov_sub)=provinciasNew$provinciaNombre
+# ver
+head(prov_sub)</code></pre>
+<p>Ya no están los numeros; y ya tenemos asegurado que los nombres se mantengan durante el análisis.</p>
+<ol start="2" style="list-style-type: decimal">
+<li>Las variables vienen con unidades de medición diferentes. Para que la técnica de comglomerados funcione adecuadamente, debemos llevar las variables a valores independientes de la unidad de medida:</li>
+</ol>
+<pre class="r"><code>prov_sub.scaled&lt;- scale(prov_sub)
+# resultado
+head(prov_sub.scaled)</code></pre>
+<p>Aquí tenemos puntuaciones Z, para todas la columnas.</p>
+<ol start="3" style="list-style-type: decimal">
+<li>El paso que sigue es clave. Aquí debemos generar información sobre las similitudes o ‘distancias’ entre las filas basándonos en las columnas:</li>
+</ol>
+<pre class="r"><code>prov_sub_d &lt;- dist(prov_sub.scaled)</code></pre>
+<ol start="4" style="list-style-type: decimal">
+<li>En <em>prov_sub_d</em> están las distancias; lo cual utilizamo en la función aglomeradora.</li>
+</ol>
+<pre class="r"><code>prov_sub_clusters=hclust(prov_sub_d)</code></pre>
 <p>Los resultados se exploran visualmente mediante el <strong>dendograma</strong>:</p>
-<pre class="r"><code>plot(d1.clusters,main='Conglomerados',cex=0.4)</code></pre>
-<p>Como se ve arriba, cada provincia comenzó aislada, y luego se van conglomerando. Uno debe decidir cuantos conglomerados usar, a partir de esta gráfica. Escojamos cuatro conglomerados:</p>
-<pre class="r"><code>grupo &lt;- cutree(d1.clusters, k = 4)
-table(grupo)</code></pre>
-<p>Para ver uno de los conglomerados:</p>
-<pre class="r"><code>row.names(df)[grupo == 4] </code></pre>
-<p>O de manera gráfica:</p>
-<pre class="r"><code>plot(d1.clusters, cex = 0.6)
-rect.hclust(d1.clusters, k = 4, border = c('red','blue','gray','green'))</code></pre>
-<p>Nótese que el número asignada a cada conglomerados no representa ningun orden. Aqui observamos el bloque 4:</p>
-<pre class="r"><code>plot(d1.clusters, cex = 0.6)
-rect.hclust(d1.clusters, k = 4, border = 'red',which = 4)</code></pre>
+<pre class="r"><code>plot(prov_sub_clusters,main='Conglomerados',cex=0.4)</code></pre>
+<p>Como se ve arriba, cada provincia comenzó aislada en la parte inferior, y luego se van conglomerando.</p>
+<p>La técnica muestra el proceso de conglomeración. Por lo general, uno revisa el dendograma y decide a partir de él cuantos conglomerados usar, a partir de esta gráfica.</p>
+<p>Si uno decidiése por cuatro conglomerados, tendría que calcularse así:</p>
+<pre class="r"><code>grupo &lt;- cutree(prov_sub_clusters, k = 4)</code></pre>
+<p>Para ver quiénes están en el conglomerado, por ejemplo, ‘4’, sería así:</p>
+<pre class="r"><code>row.names(prov_sub)[grupo == 4] </code></pre>
+<p>Este es un data frame con los grupos asignados a cada provincia:</p>
+<pre class="r"><code>asignaciones=as.data.frame(grupo) # convierto a data frame
+# que tengo:
+head(asignaciones)</code></pre>
+<pre class="r"><code>asignaciones$provincia=row.names(asignaciones) # paso los nombres a columna 
+# que tengo:
+head(asignaciones)</code></pre>
+<p>Reseteo los nombres de fila:</p>
+<pre class="r"><code>row.names(asignaciones)=NULL
+# esto queda así
+head(asignaciones)</code></pre>
+<p><strong>IMPORTANTE</strong>: Si calculásemos clusters con data de otro año, podríamos comparar si una provincia ha mejorado o decaído de uno a otro a año.</p>
+<p>Nótese que el número asignada a cada conglomerado no representa ningun orden; es decir, estar en el cluster 2 puede ser mejor que estar en el 1. Para evitar ello, debemos juntar la data qué informa sobre el cluster y la data original:</p>
+<pre class="r"><code># recuperando los datos de provincia en una copia.
+# asi evito alterar prov_sub en caso la necesite intacta luego.
+copia_prov_sub=prov_sub
+copia_prov_sub$provincia=row.names(copia_prov_sub)</code></pre>
+<p>Juntemos la data:</p>
+<pre class="r"><code># Añadiendo la información de clusters a esta data:
+copia_prov_sub=merge(copia_prov_sub,asignaciones)
+row.names(copia_prov_sub)=NULL # reseteando nombre de fila
+str(copia_prov_sub)</code></pre>
+<p>Sabiendo que grupo está en la data, pedimos los valores medios:</p>
+<pre class="r"><code>aggregate(cbind(identificacion2012,medicos2012,escolaridad2012,AguaDesague2012,
+                electrificacion2012) ~ grupo, data=copia_prov_sub,FUN=mean)</code></pre>
+<p>Como se nota, usando la media podríamos renumerar los clustes con valores más informativos, es decir, recodificar esa columna para que represente orden ascendente o descendente (y no en desorden cómo está ahi: peor es el 2, de ahi 3, de ahi 1 y el mejor el 4).</p>
+<p>El corte en 4 grupos se puede ver así:</p>
+<pre class="r"><code>plot(prov_sub_clusters, cex = 0.6)
+rect.hclust(prov_sub_clusters, k = 4, border = c('red','blue','gray','green'))</code></pre>
+<p>Resaltar el 4 sería así:</p>
+<pre class="r"><code>plot(prov_sub_clusters, cex = 0.6)
+rect.hclust(prov_sub_clusters, k = 4, border = 'red',which = 4)</code></pre>
 <p>El dendograma nos muestra el proceso de aglomeración, pero nosotros debemos decidir con cuantos clusters quedarnos.</p>
 <p>Lo interesante es que no hay una manera certera de decidir cuántos clusters debemos elegir. De hecho hay diversos indices creados para <em>sugerir</em> cuántos. Estos indices podemos verlos de esta manera:</p>
 <pre class="r"><code>library(NbClust)
-nb &lt;- NbClust(df.scaled1, method = &quot;complete&quot;) # 'dist' usa este método por defecto</code></pre>
-<p>Del reporte anterior, se ve la sugerencia depende de la regla de la mayoria. El resultado anterior se puede plotear así:</p>
+
+#usar aqui las variables normalizadas: prov_sub.scaled
+nb &lt;- NbClust(prov_sub.scaled, method = &quot;complete&quot;) # 'dist' usa este método por defecto</code></pre>
+<p>Del reporte anterior, se ve que la sugerencia depende de la regla de la mayoria: usar TRES clusters. El resultado anterior se puede plotear así:</p>
 <pre class="r"><code>library(factoextra) # toma su tiempo
 fviz_nbclust(nb) + theme_minimal()</code></pre>
 <p>El paquete <em>factoextra</em> tiene su propia función para calcular conglomerados (‘eclust’).</p>
-<pre class="r"><code>res.hc &lt;- eclust(df.scaled1, FUNcluster =&quot;hclust&quot;, k = 4,
+<pre class="r"><code># resultado de factoExtra (FE)
+prov_sub_clusters_FE &lt;- eclust(prov_sub.scaled, FUNcluster =&quot;hclust&quot;, k = 4,
                 method = &quot;complete&quot;, graph = FALSE) 
-fviz_dend(res.hc, rect = TRUE, show_labels = FALSE) </code></pre>
-<p>Este paquete permite validar qué tan buena ha sido nuestra aglomeración:</p>
-<pre class="r"><code>fviz_silhouette(res.hc)</code></pre>
+fviz_dend(prov_sub_clusters_FE, rect = TRUE, show_labels = FALSE) </code></pre>
+<p>Este resultado también guarda los clusters:</p>
+<pre class="r"><code>head(as.data.frame(prov_sub_clusters_FE$cluster))</code></pre>
+<p>Nótese que los resultados de esta función han salido iguales a los hallados con el <strong>hclust</strong> básico.</p>
+<p>Lo importante de este paquete es que nos permite validar qué tan buena ha sido nuestra aglomeración. Para ello calcula las <strong>siluetas</strong>:</p>
+<pre class="r"><code>fviz_silhouette(prov_sub_clusters_FE)</code></pre>
 <p>Un valor cercano a <strong>uno</strong> indica que el valor está bien aglomerado, si está cercano a cero indica que esta entre dos conglomerados, y si es negativo, que está en un cluster erróneo (al algoritmo acabó y no pudo ubicarlo en el grupo adecuado).</p>
-<p>El objeto <em>res.hc</em> guarda esta información de silueta. Para acceder a ella tenemos:</p>
-<pre class="r"><code>siluetas &lt;-res.hc$silinfo$widths</code></pre>
+<p>El objeto <em>prov_sub_clusters_FE</em> guarda esta información de silueta. Para acceder a ella tenemos:</p>
+<pre class="r"><code>siluetas &lt;-prov_sub_clusters_FE$silinfo$widths</code></pre>
 <p>Para ver los que están mal agrupados tenemos:</p>
 <pre class="r"><code>siluetas[siluetas$sil_width&lt;0,]</code></pre>
-<p>Cuando utilizamos la función <strong>scale</strong> para normalizar las variables usamos los valores por defecto de esa función, es decir, la media y la desviación típica. Podríamos usar las medianas y la desviaciónes de la mediana en vez de ellas:</p>
-<pre class="r"><code>medians = apply(df,2,median)
-mads = apply(df,2,mad)
-df.scaled2 = scale(df,center=medians,scale=mads)</code></pre>
+<p>Ya sabemos que si a loss resultados que acabamos de ver les aplicamos la función <em>as.data.frame</em> podremos manipularlos como cualquier tabla de datos.</p>
+<div id="nota-importante" class="section level3">
+<h3>NOTA IMPORTANTE:</h3>
+<p>Cuando utilizamos la función <strong>scale</strong> para normalizar las variables usamos los valores por defecto de esa función, es decir, la <em>media</em> y la <em>desviación típica</em>. Podríamos usar las medianas y la desviaciónes de la mediana en vez de ellas:</p>
+<pre class="r"><code>medians = apply(prov_sub,2,median)
+mads = apply(prov_sub,2,mad)
+prov_sub.scaled2 = scale(prov_sub,center=medians,scale=mads)</code></pre>
 <p>Habrán cambios cualitativos si usamos estos nuevos valores?</p>
+<p><a id="cleaning"></a></p>
+</div>
 </div>
 <div id="preparacion-de-la-data-multivariada" class="section level2">
 <h2>Preparación de la data multivariada</h2>
-<p><a id="cleaning"></a></p>
 <p>La data original es esta en el archivo “idePeru.xlsx” que lo puede descargar de <a href="https://github.com/PoliticayGobiernoPUCP/EstadisticaPoliticaGobiernoII/raw/master/sesiones/data/idhPeru.xlsx">aquí</a>.</p>
 <p>Descargue la data y guardela en la carpeta <em>data</em>. Desde ahí comience a trabajar:</p>
 <pre class="r"><code>library(openxlsx)
@@ -307,6 +354,10 @@ provincias=provincias[,c(10,1:9)] </code></pre>
 <pre class="r"><code>provinciasNew=provinciasNew[,c(1:2,11,3:10)]</code></pre>
 <p>Asi quedó:</p>
 <pre class="r"><code>head(provinciasNew)</code></pre>
+<p><a href="#beginning">ir al inicio de la página</a></p>
+<div id="volver-al-silabo" class="section level4">
+<h4><a href="https://politicaygobiernopucp.github.io/EstadisticaPoliticaGobiernoII/">VOLVER AL SILABO</a></h4>
+</div>
 </div>
 
 
