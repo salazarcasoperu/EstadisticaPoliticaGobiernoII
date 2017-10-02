@@ -11,7 +11,7 @@ ____
 <a id='beginning'></a>
 
 
-En este curso trabajaremos técnicas multivariadas. Lo complejo es justamente la cantidad de variables que intervienen y que requieren muchas veces mucho tratamiento. La mayoría de programas estadísticos (SPSS, STATA, R, etc.) tiene diversas funciones que ayudan a alistar los datos necesarios cuando se tienen muchas variables involucradas. **Esto no era así cuando sólo se trabajaban con dos variables**. **R** es muy versatil para preparar los datos para el análisis multivariado. Usted puede utilizar otro software, como **EXCEL**, para alistarlos, pero si la cantidad de datos es numerosa, pronto encontrará que son muy limitados. 
+En este curso trabajaremos técnicas multivariadas. Lo complejo es justamente la cantidad de variables que intervienen y que requieren muchas veces mucho tratamiento. La mayoría de programas estadísticos (SPSS, STATA, R, etc.) tienen diversas funciones que ayudan a alistar los datos necesarios cuando se tienen muchas variables involucradas. **Esto no era así cuando sólo se trabajaban con dos variables**. **R** es muy versatil para preparar los datos para el análisis multivariado. Usted puede utilizar otro software, como **EXCEL**, para alistarlos, pero si la cantidad de datos es numerosa, pronto encontrará que son muy limitados. 
 
 ## AGRUPANDO LAS UNIDADES DE ESTUDIO
 
