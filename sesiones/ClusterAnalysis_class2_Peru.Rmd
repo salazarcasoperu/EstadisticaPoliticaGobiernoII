@@ -11,8 +11,7 @@ ____
 
 <a id='beginning'></a>
 
-Trabajemos con los datos ya limpios de la sesión [anterior](https://rawgit.com/PoliticayGobiernoPUCP/EstadisticaPoliticaGobiernoII/master/sesiones/ExploratoryDataAnalysis_class_Peru.html
-) presentes en un archivo Excel (descargar [aqui]((https://github.com/PoliticayGobiernoPUCP/EstadisticaPoliticaGobiernoII/raw/master/sesiones/data/IDE_limpio.xlsx))):
+Trabajemos con los datos ya limpios de la sesión [anterior](https://rawgit.com/PoliticayGobiernoPUCP/EstadisticaPoliticaGobiernoII/master/sesiones/ClusterAnalysis_class_Peru.html) presentes en un archivo Excel (descargar [aqui]((https://github.com/PoliticayGobiernoPUCP/EstadisticaPoliticaGobiernoII/raw/master/sesiones/data/IDE_limpio.xlsx))):
 
 ```{r, eval=FALSE}
 library(openxlsx)
