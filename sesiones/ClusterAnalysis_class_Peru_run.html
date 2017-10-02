@@ -143,7 +143,7 @@ $(document).ready(function () {
 <h2>AGRUPANDO LAS UNIDADES DE ESTUDIO</h2>
 <p>En general, las tablas de datos se estructuran como una colección de filas (casos o unidades de estudio) y columnas (variables). En este caso, nos interesa agrupar las unidades de estudio (filas). Para este caso, utilizaremos la data creada por el <em>PNUD</em>, el Indice de Densidad del Estado. Este índice es producto de combinar otras variables.</p>
 <p>La data original del IDE-PNUD está en Excel, lo cual no sería mayor problema, sino fuera por que las <em>hojas</em> tienen varios elementos innecesarios para nuestro análisis. Esta data necesita ser tratada para dejarla lista para el análisis multivariado. Este proceso está descrito más abajo, siga este <a href="#cleaning">link</a> para revisarlo.</p>
-<p>La data preparada para ser analizada podemos encontrarla en el archivo IDE_limpio.xlsx, descarguelo usando el link y guárdelo en la carpeta <em>data</em>. Desde ahí comience:</p>
+<p>La data preparada para ser analizada podemos encontrarla en el archivo IDE_limpio.xlsx, descarguelo usando este <a href="https://github.com/PoliticayGobiernoPUCP/EstadisticaPoliticaGobiernoII/raw/master/sesiones/data/IDE_limpio.xlsx">link</a> y guárdelo en la carpeta <em>data</em>. Desde ahí comience:</p>
 <pre class="r"><code>library(openxlsx)
 folder='data'
 fileName='IDE_limpio.xlsx'
@@ -533,13 +533,96 @@ head(datos,10)</code></pre>
 ## 8            64.479036686809536      67        67.91461510721939     119
 ## 9            54.834081786102814      96       72.169261203916292     105
 ## 10           37.714508854591834     156       39.489081334171054     191</code></pre>
-<p><strong>Openxlsx</strong> es muy eficiente, pues inclusive omite columnas vacías. Sin embargo, vemos que la data no inicia donde debe, los titulos no corresponden a las columnas; y, aunque que las Provincias figuran en cada fila, los Departamentos no están en las filas, sino como titulos para las provincias (y encima no hay distritos, aunque la hoja muestra ese nombre). Arreglemos esto.</p>
-<pre class="r"><code>filaInicial=4
+<p>Esta data tiene malos títulos:</p>
+<pre class="r"><code>names(datos)</code></pre>
+<pre><code>##  [1] &quot;ÍNDICE.DE.DENSIDAD.DEL.ESTADO.2012:.DEPARTAMENTAL.Y.PROVINCIAL&quot;
+##  [2] &quot;X2&quot;                                                            
+##  [3] &quot;X3&quot;                                                            
+##  [4] &quot;X4&quot;                                                            
+##  [5] &quot;X5&quot;                                                            
+##  [6] &quot;X6&quot;                                                            
+##  [7] &quot;X7&quot;                                                            
+##  [8] &quot;X8&quot;                                                            
+##  [9] &quot;X9&quot;                                                            
+## [10] &quot;X10&quot;                                                           
+## [11] &quot;X11&quot;                                                           
+## [12] &quot;X12&quot;                                                           
+## [13] &quot;X13&quot;                                                           
+## [14] &quot;X14&quot;                                                           
+## [15] &quot;X15&quot;                                                           
+## [16] &quot;X16&quot;                                                           
+## [17] &quot;X17&quot;</code></pre>
+<p><strong>Openxlsx</strong> es muy eficiente, pues inclusive omite columnas vacías. Sin embargo, vemos que la data no inicia donde debe, los titulos no corresponden a las columnas; y, aunque las Provincias figuran en cada fila, los Departamentos no están en las filas, sino como titulos para las provincias (y por aún no hay distritos, aunque la hoja muestra ese nombre). Arreglemos esto.</p>
+<pre class="r"><code>filaInicial=4 # Desde aquí comienzas a leer. Asegúrese que no pierde titulos.
 datos=read.xlsx(fileToRead, 
                 sheet = 1, 
                 startRow = filaInicial, 
-                skipEmptyRows = TRUE, skipEmptyCols = TRUE)</code></pre>
-<p>Los reportes de este tipo sueles añadir información innecesaria al final, verifiquemos:</p>
+                skipEmptyRows = TRUE, skipEmptyCols = TRUE)
+
+# ver:
+head(datos)</code></pre>
+<pre><code>##       X1       X2          X3 Población.2012      X5
+## 1   &lt;NA&gt;     &lt;NA&gt;   Provincia           &lt;NA&gt;    &lt;NA&gt;
+## 2   &lt;NA&gt;     &lt;NA&gt;    Distrito     habitantes ranking
+## 3 000000 PERÚ  a/        &lt;NA&gt;       30135875       -
+## 4 010000 AMAZONAS        &lt;NA&gt;         417508      20
+## 5 010100     &lt;NA&gt; Chachapoyas          54783     113
+## 6 010200     &lt;NA&gt;       Bagua          77438      79
+##   Índice.de.Densidad.del.Estado      X7
+## 1                          &lt;NA&gt;    &lt;NA&gt;
+## 2                           IDE ranking
+## 3           0.76662632867783975       -
+## 4           0.62795269269252496      20
+## 5           0.77369947765747837      26
+## 6           0.66228046503747584      82
+##   Población.con.acta.nacimiento.o.DNI      X9
+## 1                                &lt;NA&gt;    &lt;NA&gt;
+## 2                                   % ranking
+## 3                  98.313826338129147       -
+## 4                  94.942033052925879      24
+## 5                  98.617881202736541      59
+## 6                  94.607868232246133     180
+##   Médicos.por.cada.10,000.habitantes     X11
+## 1                               &lt;NA&gt;    &lt;NA&gt;
+## 2                              Razon ranking
+## 3                 22.731906420779179       -
+## 4                 13.313367648045066      14
+## 5                 25.450023719049433      13
+## 6                 14.609120874914693      49
+##   Tasa.asistencia.a.Secundaria.(Pob..12.a.16.años)     X13
+## 1                                             &lt;NA&gt;    &lt;NA&gt;
+## 2                                                % ranking
+## 3                               84.988401001675385       -
+## 4                               76.328274672064708      24
+## 5                               91.498562457256497      32
+## 6                               79.790177700938358     114
+##   Viviendas.con.agua.y.desague     X15 Viviendas.electrificadas     X17
+## 1                         &lt;NA&gt;    &lt;NA&gt;                     &lt;NA&gt;    &lt;NA&gt;
+## 2                            % ranking                        % Ranking
+## 3            76.01277746565404       -       86.111648832162686       -
+## 4            54.35445620734103      17       66.162636333855772      24
+## 5           70.345402142059839      54       83.971186828270632      52
+## 6           64.479036686809536      67        67.91461510721939     119</code></pre>
+<p>Es importante que la <strong>filaInicial</strong> permita que la data que recuperes te de los titulo, no como el caso anterior, veamos que tenemos antes:</p>
+<pre class="r"><code>names(datos)</code></pre>
+<pre><code>##  [1] &quot;X1&quot;                                              
+##  [2] &quot;X2&quot;                                              
+##  [3] &quot;X3&quot;                                              
+##  [4] &quot;Población.2012&quot;                                  
+##  [5] &quot;X5&quot;                                              
+##  [6] &quot;Índice.de.Densidad.del.Estado&quot;                   
+##  [7] &quot;X7&quot;                                              
+##  [8] &quot;Población.con.acta.nacimiento.o.DNI&quot;             
+##  [9] &quot;X9&quot;                                              
+## [10] &quot;Médicos.por.cada.10,000.habitantes&quot;              
+## [11] &quot;X11&quot;                                             
+## [12] &quot;Tasa.asistencia.a.Secundaria.(Pob..12.a.16.años)&quot;
+## [13] &quot;X13&quot;                                             
+## [14] &quot;Viviendas.con.agua.y.desague&quot;                    
+## [15] &quot;X15&quot;                                             
+## [16] &quot;Viviendas.electrificadas&quot;                        
+## [17] &quot;X17&quot;</code></pre>
+<p>Este es buen comienzo. Ahora veamos si las últimas filas tienen data, u elementos innecesarios:</p>
 <pre class="r"><code>tail(datos,10)</code></pre>
 <pre><code>##                                                                                                                                                                                                                     X1
 ## 217                                                                                                                                                                                                             240300
@@ -607,9 +690,10 @@ datos=read.xlsx(fileToRead,
 ## 224                         &lt;NA&gt; &lt;NA&gt;                     &lt;NA&gt; &lt;NA&gt;
 ## 225                         &lt;NA&gt; &lt;NA&gt;                     &lt;NA&gt; &lt;NA&gt;
 ## 226                         &lt;NA&gt; &lt;NA&gt;                     &lt;NA&gt; &lt;NA&gt;</code></pre>
-<p>La data acaba en la fila 222, con la provincia de Purus. Eliminemos filas innecesarias:</p>
-<pre class="r"><code>datos=datos[-c(223:226),]</code></pre>
-<p>El encabezado aun tiene problemas:</p>
+<p>La data acaba en la fila 222, con la provincia de <strong>Purus</strong>. Eliminemos filas innecesarias:</p>
+<pre class="r"><code># no queremos de la fila 223 a la 226 (nota la ',')
+datos=datos[-c(223:226),] # para eliminar 4 ultimas filas use también: datos=head(datos,-4)</code></pre>
+<p>El encabezado también puede tener filas innecesarias:</p>
 <pre class="r"><code>head(datos)</code></pre>
 <pre><code>##       X1       X2          X3 Población.2012      X5
 ## 1   &lt;NA&gt;     &lt;NA&gt;   Provincia           &lt;NA&gt;    &lt;NA&gt;
@@ -653,11 +737,51 @@ datos=read.xlsx(fileToRead,
 ## 4            54.35445620734103      17       66.162636333855772      24
 ## 5           70.345402142059839      54       83.971186828270632      52
 ## 6           64.479036686809536      67        67.91461510721939     119</code></pre>
-<p>Las filas 1 al 3 nos innecesarias:</p>
-<pre class="r"><code>datos=datos[-c(1:3),]</code></pre>
-<p>Separemos y guardemos los nombres de regiones y sus codigos (ubigeos) :</p>
+<p>Piensa en la esquina superior izquierda de un <strong>cuadrado</strong> (tabla) cuando quieras eliminar filas: éste puede comenzar en el ubigeo de AMAZONAS. De ahí que las filas 1 al 3 nos innecesarias:</p>
+<pre class="r"><code>datos=datos[-c(1:3),] # para eliminar 3 primeras filas use también: datos=tail(datos,-3)
+
+# asi va quedando:
+head(datos)</code></pre>
+<pre><code>##       X1       X2           X3 Población.2012  X5
+## 4 010000 AMAZONAS         &lt;NA&gt;         417508  20
+## 5 010100     &lt;NA&gt;  Chachapoyas          54783 113
+## 6 010200     &lt;NA&gt;        Bagua          77438  79
+## 7 010300     &lt;NA&gt;      Bongará          32317 145
+## 8 010400     &lt;NA&gt; Condorcanqui          51802 119
+## 9 010500     &lt;NA&gt;         Luya          52185 117
+##   Índice.de.Densidad.del.Estado  X7 Población.con.acta.nacimiento.o.DNI
+## 4           0.62795269269252496  20                  94.942033052925879
+## 5           0.77369947765747837  26                  98.617881202736541
+## 6           0.66228046503747584  82                  94.607868232246133
+## 7           0.63182491983336697 103                  97.468069451399515
+## 8           0.45982417359739747 191                  86.231962490583811
+## 9           0.60471977563772472 126                  96.192721992265234
+##    X9 Médicos.por.cada.10,000.habitantes X11
+## 4  24                 13.313367648045066  14
+## 5  59                 25.450023719049433  13
+## 6 180                 14.609120874914693  49
+## 7 113                 9.0102065354508269 114
+## 8 192                 8.5569592849723382 120
+## 9 155                 12.418003208422093  70
+##   Tasa.asistencia.a.Secundaria.(Pob..12.a.16.años) X13
+## 4                               76.328274672064708  24
+## 5                               91.498562457256497  32
+## 6                               79.790177700938358 114
+## 7                               76.424036582846838 133
+## 8                               52.214935311064806 191
+## 9                               74.725966346695259 143
+##   Viviendas.con.agua.y.desague X15 Viviendas.electrificadas X17
+## 4            54.35445620734103  17       66.162636333855772  24
+## 5           70.345402142059839  54       83.971186828270632  52
+## 6           64.479036686809536  67        67.91461510721939 119
+## 7           54.834081786102814  96       72.169261203916292 105
+## 8           37.714508854591834 156       39.489081334171054 191
+## 9           43.348418298915448 136       67.396109166949586 123</code></pre>
+<p>Piensa estratégucamente ahora. Los ubigeos tienen mezclados los de Departamento o Región con los de provincia en la misma columna (la X1). Pero en la columna de al lado (X2) hay celdas vacias salvo cuando aparece el nombre de la region. Creemos entonces dos subsets (subtabla de <em>datos</em>), uno para región y otro para distrito.</p>
+<p>Primero lo de regiones:</p>
 <pre class="r"><code>queColumnas=c(1,2)
-regiones=datos[,queColumnas]
+regiones=datos[,queColumnas] # subtabla 'regiones' (subset de 'data') / note donde está la coma','
+# asi va
 head(regiones,10)</code></pre>
 <pre><code>##        X1       X2
 ## 4  010000 AMAZONAS
@@ -670,23 +794,40 @@ head(regiones,10)</code></pre>
 ## 11 010700     &lt;NA&gt;
 ## 12 020000   ANCASH
 ## 13 020100     &lt;NA&gt;</code></pre>
-<p>Podemos quedarnos con los casos completos por fila:</p>
-<pre class="r"><code>regiones=regiones[complete.cases(regiones),]
-head(regiones,10)</code></pre>
-<pre><code>##         X1           X2
-## 4   010000     AMAZONAS
-## 12  020000       ANCASH
-## 33  030000     APURÍMAC
-## 41  040000     AREQUIPA
-## 50  050000     AYACUCHO
-## 62  060000    CAJAMARCA
-## 77  080000        CUSCO
-## 91  090000 HUANCAVELICA
-## 99  100000      HUÁNUCO
-## 111 110000          ICA</code></pre>
-<p>Cambiemos nombres:</p>
+<p>Vemos que los ubigeos que tiene al lado las celdas vacías (<em>NA</em>) son ubigeos de provincias; de ahí que esas filas no las necesitamos. Pidamos a R que <em>regiones</em> se quede con las filas (<strong>cases</strong>) que tengan valores completos:</p>
+<pre class="r"><code>regiones=regiones[complete.cases(regiones),] # note la posición de la coma ','
+# así va:
+regiones</code></pre>
+<pre><code>##         X1            X2
+## 4   010000      AMAZONAS
+## 12  020000        ANCASH
+## 33  030000      APURÍMAC
+## 41  040000      AREQUIPA
+## 50  050000      AYACUCHO
+## 62  060000     CAJAMARCA
+## 77  080000         CUSCO
+## 91  090000  HUANCAVELICA
+## 99  100000       HUÁNUCO
+## 111 110000           ICA
+## 117 120000         JUNÍN
+## 127 130000   LA LIBERTAD
+## 140 140000    LAMBAYEQUE
+## 144 150000          LIMA
+## 155 160000        LORETO
+## 163 170000 MADRE DE DIOS
+## 167 180000      MOQUEGUA
+## 171 190000         PASCO
+## 175 200000         PIURA
+## 184 210000          PUNO
+## 198 220000    SAN MARTÍN
+## 209 230000         TACNA
+## 214 240000        TUMBES
+## 218 250000       UCAYALI</code></pre>
+<p>Pues tenemos todos los departamentos del Perú con sus ubigeos. Sólo faltaría darle nombre a sus columnas</p>
 <pre class="r"><code>nombresNuevos=c('regionUbigeo','regionNombre')
 names(regiones)=nombresNuevos
+
+# asi va:
 head(regiones)</code></pre>
 <pre><code>##    regionUbigeo regionNombre
 ## 4        010000     AMAZONAS
@@ -695,9 +836,52 @@ head(regiones)</code></pre>
 ## 41       040000     AREQUIPA
 ## 50       050000     AYACUCHO
 ## 62       060000    CAJAMARCA</code></pre>
-<p>De igual manera, guardemos la info de las provincias:</p>
+<p>Regresemos a ‘data’:</p>
+<pre class="r"><code>#veamos:
+head(datos)</code></pre>
+<pre><code>##       X1       X2           X3 Población.2012  X5
+## 4 010000 AMAZONAS         &lt;NA&gt;         417508  20
+## 5 010100     &lt;NA&gt;  Chachapoyas          54783 113
+## 6 010200     &lt;NA&gt;        Bagua          77438  79
+## 7 010300     &lt;NA&gt;      Bongará          32317 145
+## 8 010400     &lt;NA&gt; Condorcanqui          51802 119
+## 9 010500     &lt;NA&gt;         Luya          52185 117
+##   Índice.de.Densidad.del.Estado  X7 Población.con.acta.nacimiento.o.DNI
+## 4           0.62795269269252496  20                  94.942033052925879
+## 5           0.77369947765747837  26                  98.617881202736541
+## 6           0.66228046503747584  82                  94.607868232246133
+## 7           0.63182491983336697 103                  97.468069451399515
+## 8           0.45982417359739747 191                  86.231962490583811
+## 9           0.60471977563772472 126                  96.192721992265234
+##    X9 Médicos.por.cada.10,000.habitantes X11
+## 4  24                 13.313367648045066  14
+## 5  59                 25.450023719049433  13
+## 6 180                 14.609120874914693  49
+## 7 113                 9.0102065354508269 114
+## 8 192                 8.5569592849723382 120
+## 9 155                 12.418003208422093  70
+##   Tasa.asistencia.a.Secundaria.(Pob..12.a.16.años) X13
+## 4                               76.328274672064708  24
+## 5                               91.498562457256497  32
+## 6                               79.790177700938358 114
+## 7                               76.424036582846838 133
+## 8                               52.214935311064806 191
+## 9                               74.725966346695259 143
+##   Viviendas.con.agua.y.desague X15 Viviendas.electrificadas X17
+## 4            54.35445620734103  17       66.162636333855772  24
+## 5           70.345402142059839  54       83.971186828270632  52
+## 6           64.479036686809536  67        67.91461510721939 119
+## 7           54.834081786102814  96       72.169261203916292 105
+## 8           37.714508854591834 156       39.489081334171054 191
+## 9           43.348418298915448 136       67.396109166949586 123</code></pre>
+<p>En <em>X1</em> están los ubigeos de las provincias, pero también de los departamentos. En <em>X2</em> aparecen los nombres de los departamentos, y en <em>X3</em> los nombres de las provincias. Con esta información creemos la subtabla provincias:</p>
+<ul>
+<li>Eliminemos la segunda columna (<em>X2</em>) pues no es necesaria:</li>
+</ul>
 <pre class="r"><code>queColumnas=c(2)
-provincias=datos[,-queColumnas]
+provincias=datos[,-queColumnas] # subtabla 'provincoas' (subset de 'data') / note donde está la coma','
+
+# asi va:
 head(provincias,10)</code></pre>
 <pre><code>##        X1                   X3 Población.2012  X5
 ## 4  010000                 &lt;NA&gt;         417508  20
@@ -772,80 +956,80 @@ head(provincias,10)</code></pre>
 ## [14] &quot;X15&quot;                                             
 ## [15] &quot;Viviendas.electrificadas&quot;                        
 ## [16] &quot;X17&quot;</code></pre>
-<p>X1 y X3 son necesarias. Eliminemos todas las otras que comiencen con X (los rankings):</p>
-<pre class="r"><code>dejandoUno=seq(4,16,2) # 4,6,8, etc.
-queColumnas=c(dejandoUno)
+<p><em>X1</em> y <em>X3</em> son necesarias, ahi están los ubigeos de las provincias y sus nombres. Todas las otras que comienzan con X son los rankings, y no los necesitamos. Vemos que sus posiciones como columna van de la 4 a la 16 saltando uno, osea sus posiciones son:</p>
+<pre class="r"><code>seq(4,16,2)  # seq(inicio, fin, salto)</code></pre>
+<pre><code>## [1]  4  6  8 10 12 14 16</code></pre>
+<p>Gracias a este comando, podemos eliminar esas columnas</p>
+<pre class="r"><code>queColumnas=seq(4,16,2)
 provincias=provincias[,-queColumnas]
-head(provincias,10)</code></pre>
-<pre><code>##        X1                   X3 Población.2012
-## 4  010000                 &lt;NA&gt;         417508
-## 5  010100          Chachapoyas          54783
-## 6  010200                Bagua          77438
-## 7  010300              Bongará          32317
-## 8  010400         Condorcanqui          51802
-## 9  010500                 Luya          52185
-## 10 010600 Rodríguez de Mendoza          30236
-## 11 010700            Utcubamba         118747
-## 12 020000                 &lt;NA&gt;        1129391
-## 13 020100               Huaraz         161003
-##    Índice.de.Densidad.del.Estado Población.con.acta.nacimiento.o.DNI
-## 4            0.62795269269252496                  94.942033052925879
-## 5            0.77369947765747837                  98.617881202736541
-## 6            0.66228046503747584                  94.607868232246133
-## 7            0.63182491983336697                  97.468069451399515
-## 8            0.45982417359739747                  86.231962490583811
-## 9            0.60471977563772472                  96.192721992265234
-## 10           0.63122642672378437                  97.343101025328792
-## 11           0.60966053473904136                  95.174493739529467
-## 12           0.73583334127948796                  97.664318362736509
-## 13            0.8118805640019543                  98.507298541977633
-##    Médicos.por.cada.10,000.habitantes
-## 4                  13.313367648045066
-## 5                  25.450023719049433
-## 6                  14.609120874914693
-## 7                  9.0102065354508269
-## 8                  8.5569592849723382
-## 9                  12.418003208422093
-## 10                  14.87868246110053
-## 11                 10.110166644008078
-## 12                 15.904672924114225
-## 13                 21.806642843508797
-##    Tasa.asistencia.a.Secundaria.(Pob..12.a.16.años)
-## 4                                76.328274672064708
-## 5                                91.498562457256497
-## 6                                79.790177700938358
-## 7                                76.424036582846838
-## 8                                52.214935311064806
-## 9                                74.725966346695259
-## 10                               79.424387744349531
-## 11                               77.168327611461081
-## 12                               84.582284827579642
-## 13                                95.00630605517199
-##    Viviendas.con.agua.y.desague Viviendas.electrificadas
-## 4             54.35445620734103       66.162636333855772
-## 5            70.345402142059839       83.971186828270632
-## 6            64.479036686809536        67.91461510721939
-## 7            54.834081786102814       72.169261203916292
-## 8            37.714508854591834       39.489081334171054
-## 9            43.348418298915448       67.396109166949586
-## 10           46.501816616265728       67.546103874113939
-## 11           52.519513684215681       63.117654594301008
-## 12           73.850427006054048       85.311852236516785
-## 13           82.932637033830801       93.149635630815425</code></pre>
-<p>Nuevamente, podemos quedarnos con los casos completos por fila:</p>
+
+# estas columnas quedan:
+names(provincias)</code></pre>
+<pre><code>## [1] &quot;X1&quot;                                              
+## [2] &quot;X3&quot;                                              
+## [3] &quot;Población.2012&quot;                                  
+## [4] &quot;Índice.de.Densidad.del.Estado&quot;                   
+## [5] &quot;Población.con.acta.nacimiento.o.DNI&quot;             
+## [6] &quot;Médicos.por.cada.10,000.habitantes&quot;              
+## [7] &quot;Tasa.asistencia.a.Secundaria.(Pob..12.a.16.años)&quot;
+## [8] &quot;Viviendas.con.agua.y.desague&quot;                    
+## [9] &quot;Viviendas.electrificadas&quot;</code></pre>
+<p>Renombremos las dos primeras columnas</p>
+<pre class="r"><code>names(provincias)[c(1,2)]=c('provinciaUbigeo','provinciaNombre')
+
+# asi va:
+head(provincias)</code></pre>
+<pre><code>##   provinciaUbigeo provinciaNombre Población.2012
+## 4          010000            &lt;NA&gt;         417508
+## 5          010100     Chachapoyas          54783
+## 6          010200           Bagua          77438
+## 7          010300         Bongará          32317
+## 8          010400    Condorcanqui          51802
+## 9          010500            Luya          52185
+##   Índice.de.Densidad.del.Estado Población.con.acta.nacimiento.o.DNI
+## 4           0.62795269269252496                  94.942033052925879
+## 5           0.77369947765747837                  98.617881202736541
+## 6           0.66228046503747584                  94.607868232246133
+## 7           0.63182491983336697                  97.468069451399515
+## 8           0.45982417359739747                  86.231962490583811
+## 9           0.60471977563772472                  96.192721992265234
+##   Médicos.por.cada.10,000.habitantes
+## 4                 13.313367648045066
+## 5                 25.450023719049433
+## 6                 14.609120874914693
+## 7                 9.0102065354508269
+## 8                 8.5569592849723382
+## 9                 12.418003208422093
+##   Tasa.asistencia.a.Secundaria.(Pob..12.a.16.años)
+## 4                               76.328274672064708
+## 5                               91.498562457256497
+## 6                               79.790177700938358
+## 7                               76.424036582846838
+## 8                               52.214935311064806
+## 9                               74.725966346695259
+##   Viviendas.con.agua.y.desague Viviendas.electrificadas
+## 4            54.35445620734103       66.162636333855772
+## 5           70.345402142059839       83.971186828270632
+## 6           64.479036686809536        67.91461510721939
+## 7           54.834081786102814       72.169261203916292
+## 8           37.714508854591834       39.489081334171054
+## 9           43.348418298915448       67.396109166949586</code></pre>
+<p>Todas las filas de provincias tienen la data completa. Pero esta tabla o cuadrado hay que reducirlo: donde estan los ubigeos de departamento hay una celda vacia, y la data de esas filas son los totales del departamento. De ahí que quedemosnos solo con las filas de provincias (asi se llama la subtabla). Para eliminar las filas (casos) de los departamentos, digamosle nuevamente a R que se quede con la data completa, y como las filas de departamento tienen una celda con <em>NA</em>, esa fila se eliminará.</p>
 <pre class="r"><code>provincias=provincias[complete.cases(provincias),]
+
+# asi va:
 head(provincias,10)</code></pre>
-<pre><code>##        X1                   X3 Población.2012
-## 5  010100          Chachapoyas          54783
-## 6  010200                Bagua          77438
-## 7  010300              Bongará          32317
-## 8  010400         Condorcanqui          51802
-## 9  010500                 Luya          52185
-## 10 010600 Rodríguez de Mendoza          30236
-## 11 010700            Utcubamba         118747
-## 13 020100               Huaraz         161003
-## 14 020200                 Aija           7974
-## 15 020300     Antonio Raymondi          16879
+<pre><code>##    provinciaUbigeo      provinciaNombre Población.2012
+## 5           010100          Chachapoyas          54783
+## 6           010200                Bagua          77438
+## 7           010300              Bongará          32317
+## 8           010400         Condorcanqui          51802
+## 9           010500                 Luya          52185
+## 10          010600 Rodríguez de Mendoza          30236
+## 11          010700            Utcubamba         118747
+## 13          020100               Huaraz         161003
+## 14          020200                 Aija           7974
+## 15          020300     Antonio Raymondi          16879
 ##    Índice.de.Densidad.del.Estado Población.con.acta.nacimiento.o.DNI
 ## 5            0.77369947765747837                  98.617881202736541
 ## 6            0.66228046503747584                  94.607868232246133
@@ -890,45 +1074,9 @@ head(provincias,10)</code></pre>
 ## 13           82.932637033830801       93.149635630815425
 ## 14           47.784067703830971       79.121961813978587
 ## 15           48.918113519453307       73.876462551210125</code></pre>
-<p>Renombremos las dos primeras columnas</p>
-<pre class="r"><code>names(provincias)[c(1,2)]=c('provinciaUbigeo','provinciaNombre')
-head(provincias)</code></pre>
-<pre><code>##    provinciaUbigeo      provinciaNombre Población.2012
-## 5           010100          Chachapoyas          54783
-## 6           010200                Bagua          77438
-## 7           010300              Bongará          32317
-## 8           010400         Condorcanqui          51802
-## 9           010500                 Luya          52185
-## 10          010600 Rodríguez de Mendoza          30236
-##    Índice.de.Densidad.del.Estado Población.con.acta.nacimiento.o.DNI
-## 5            0.77369947765747837                  98.617881202736541
-## 6            0.66228046503747584                  94.607868232246133
-## 7            0.63182491983336697                  97.468069451399515
-## 8            0.45982417359739747                  86.231962490583811
-## 9            0.60471977563772472                  96.192721992265234
-## 10           0.63122642672378437                  97.343101025328792
-##    Médicos.por.cada.10,000.habitantes
-## 5                  25.450023719049433
-## 6                  14.609120874914693
-## 7                  9.0102065354508269
-## 8                  8.5569592849723382
-## 9                  12.418003208422093
-## 10                  14.87868246110053
-##    Tasa.asistencia.a.Secundaria.(Pob..12.a.16.años)
-## 5                                91.498562457256497
-## 6                                79.790177700938358
-## 7                                76.424036582846838
-## 8                                52.214935311064806
-## 9                                74.725966346695259
-## 10                               79.424387744349531
-##    Viviendas.con.agua.y.desague Viviendas.electrificadas
-## 5            70.345402142059839       83.971186828270632
-## 6            64.479036686809536        67.91461510721939
-## 7            54.834081786102814       72.169261203916292
-## 8            37.714508854591834       39.489081334171054
-## 9            43.348418298915448       67.396109166949586
-## 10           46.501816616265728       67.546103874113939</code></pre>
-<p>Con la misma lógica, simplifiquemos los otros nombres de columnas:</p>
+<p><strong>ADVERTENCIA</strong>: El comando anterior puede eliminar a una fila con data de provincia si es que alguna de sus celdas tenía un <em>NA</em>. Un comando que garantice quedarse con las filas donde una celda esté vacía en alguna columna en particular es:</p>
+<pre class="r"><code>provincias[complete.cases(provincias$provinciaNombre),]</code></pre>
+<p>Por un asunto <em>decorativo</em>, simplifiquemos los otros nombres de columnas:</p>
 <pre class="r"><code>names(provincias)</code></pre>
 <pre><code>## [1] &quot;provinciaUbigeo&quot;                                 
 ## [2] &quot;provinciaNombre&quot;                                 
@@ -939,7 +1087,12 @@ head(provincias)</code></pre>
 ## [7] &quot;Tasa.asistencia.a.Secundaria.(Pob..12.a.16.años)&quot;
 ## [8] &quot;Viviendas.con.agua.y.desague&quot;                    
 ## [9] &quot;Viviendas.electrificadas&quot;</code></pre>
-<pre class="r"><code>names(provincias)[c(3:9)]=c('pob2012','ide2012','identificacion2012','medicos2012','escolaridad2012','AguaDesague2012','electrificacion2012')
+<p>De ahí que podemos cambiar:</p>
+<pre class="r"><code># estamos cambiando los nombres de la columna 3 hasta la 9
+# hay que ingresar los nombres en el orden que se requiere
+names(provincias)[c(3:9)]=c('pob2012','ide2012','identificacion2012','medicos2012','escolaridad2012','AguaDesague2012','electrificacion2012')
+
+# asi queda
 head(provincias)</code></pre>
 <pre><code>##    provinciaUbigeo      provinciaNombre pob2012             ide2012
 ## 5           010100          Chachapoyas   54783 0.77369947765747837
@@ -962,12 +1115,12 @@ head(provincias)</code></pre>
 ## 8  37.714508854591834  39.489081334171054
 ## 9  43.348418298915448  67.396109166949586
 ## 10 46.501816616265728  67.546103874113939</code></pre>
-<p>Podriamos calcular la media de la población:</p>
+<p>La data está casi lista, pero queda verificar que la data a a poder ser tratada de la manera esperada. Por ejemplo, debería ser posible sacar la media aritmetica de la column población (<em>pob2012</em>):</p>
 <pre class="r"><code>mean(provincias$pob2012)</code></pre>
 <pre><code>## Warning in mean.default(provincias$pob2012): argument is not numeric or
 ## logical: returning NA</code></pre>
 <pre><code>## [1] NA</code></pre>
-<p>Si aplicas una función numérica, y sale error, es por que quizas los datos tengan problemas:</p>
+<p>Si aplicas una función numérica, y sale error, es por que quizas los datos tengan problemas. Aqui es necesario ver la e<strong>str</strong>uctura:</p>
 <pre class="r"><code>str(provincias)</code></pre>
 <pre><code>## 'data.frame':    195 obs. of  9 variables:
 ##  $ provinciaUbigeo    : chr  &quot;010100&quot; &quot;010200&quot; &quot;010300&quot; &quot;010400&quot; ...
@@ -979,8 +1132,12 @@ head(provincias)</code></pre>
 ##  $ escolaridad2012    : chr  &quot;91.498562457256497&quot; &quot;79.790177700938358&quot; &quot;76.424036582846838&quot; &quot;52.214935311064806&quot; ...
 ##  $ AguaDesague2012    : chr  &quot;70.345402142059839&quot; &quot;64.479036686809536&quot; &quot;54.834081786102814&quot; &quot;37.714508854591834&quot; ...
 ##  $ electrificacion2012: chr  &quot;83.971186828270632&quot; &quot;67.91461510721939&quot; &quot;72.169261203916292&quot; &quot;39.489081334171054&quot; ...</code></pre>
-<p>Las funciones numéricas no pueden aplicarse a los textos (‘chr’), por ende:</p>
+<p>Las funciones numéricas no pueden aplicarse a los textos (‘chr’), y todos los numeros aparecen como texto. La función <strong>as.numeric</strong> debe aplicarse a varias columnas:</p>
+<pre class="r"><code># ESTO NO FUNCIONA!!!!!!
+as.numeric(provincias[,c(3:9)])</code></pre>
+<p>Si fuera sólo una columna, el comando anterior hubiera funcionado. Como son varias, hay que decirle a R que aplique esta función <strong>columna por columna</strong>; para eso tenemos <strong>lapply</strong>:</p>
 <pre class="r"><code>provincias[,c(3:9)]=lapply(provincias[,c(3:9)],as.numeric)
+# ahora
 str(provincias)</code></pre>
 <pre><code>## 'data.frame':    195 obs. of  9 variables:
 ##  $ provinciaUbigeo    : chr  &quot;010100&quot; &quot;010200&quot; &quot;010300&quot; &quot;010400&quot; ...
@@ -993,29 +1150,17 @@ str(provincias)</code></pre>
 ##  $ AguaDesague2012    : num  70.3 64.5 54.8 37.7 43.3 ...
 ##  $ electrificacion2012: num  84 67.9 72.2 39.5 67.4 ...</code></pre>
 <p>Ahora si funciona:</p>
-<pre class="r"><code>mean(provincias$pob2012)</code></pre>
+<pre class="r"><code>mean(provincias$pob2012) # si hay NA, hay que escribir: mean(provincias$pob2012,na.rm=T), para obviarlos</code></pre>
 <pre><code>## [1] 154542.9</code></pre>
-<p>Podemos ahora crear la columna <em>regionUbigeo</em>, usando <em>provinciaUbigeo</em>; sólo hay que quedarnos con los dos (2) primeros digitos de esa columna (nótese que están como texto).</p>
-<pre class="r"><code>#primero la duplicamos pero con otro nombre (por defecto nueva columna va al final)
-provincias$regionUbigeo=provincias$provinciaUbigeo</code></pre>
-<p>A la nueva columna le reemplazamos con ‘0000’ todo valor luego de los primeros dos digitos:</p>
-<pre class="r"><code>substr(provincias$regionUbigeo,3,6)='0000'</code></pre>
-<p>Podemos reubicar la posición de la última columna:</p>
-<pre class="r"><code># jugando con la posiciones:
-provincias=provincias[,c(10,1:9)] </code></pre>
-<p>Tenemos entonces:</p>
-<pre class="r"><code>head(provincias,10)</code></pre>
-<pre><code>##    regionUbigeo provinciaUbigeo      provinciaNombre pob2012   ide2012
-## 5        010000          010100          Chachapoyas   54783 0.7736995
-## 6        010000          010200                Bagua   77438 0.6622805
-## 7        010000          010300              Bongará   32317 0.6318249
-## 8        010000          010400         Condorcanqui   51802 0.4598242
-## 9        010000          010500                 Luya   52185 0.6047198
-## 10       010000          010600 Rodríguez de Mendoza   30236 0.6312264
-## 11       010000          010700            Utcubamba  118747 0.6096605
-## 13       020000          020100               Huaraz  161003 0.8118806
-## 14       020000          020200                 Aija    7974 0.6579253
-## 15       020000          020300     Antonio Raymondi   16879 0.6113363
+<p>Veamos la data de nuevo, provincias:</p>
+<pre class="r"><code>head(provincias)</code></pre>
+<pre><code>##    provinciaUbigeo      provinciaNombre pob2012   ide2012
+## 5           010100          Chachapoyas   54783 0.7736995
+## 6           010200                Bagua   77438 0.6622805
+## 7           010300              Bongará   32317 0.6318249
+## 8           010400         Condorcanqui   51802 0.4598242
+## 9           010500                 Luya   52185 0.6047198
+## 10          010600 Rodríguez de Mendoza   30236 0.6312264
 ##    identificacion2012 medicos2012 escolaridad2012 AguaDesague2012
 ## 5            98.61788   25.450024        91.49856        70.34540
 ## 6            94.60787   14.609121        79.79018        64.47904
@@ -1023,35 +1168,76 @@ provincias=provincias[,c(10,1:9)] </code></pre>
 ## 8            86.23196    8.556959        52.21494        37.71451
 ## 9            96.19272   12.418003        74.72597        43.34842
 ## 10           97.34310   14.878682        79.42439        46.50182
-## 11           95.17449   10.110167        77.16833        52.51951
-## 13           98.50730   21.806643        95.00631        82.93264
-## 14           98.23439    8.593985        89.49891        47.78407
-## 15           96.81580    4.992252        77.73737        48.91811
 ##    electrificacion2012
 ## 5             83.97119
 ## 6             67.91462
 ## 7             72.16926
 ## 8             39.48908
 ## 9             67.39611
-## 10            67.54610
-## 11            63.11765
-## 13            93.14964
-## 14            79.12196
-## 15            73.87646</code></pre>
-<p>Hagamos el ‘<em>merge</em>’, entre los datos de <strong>regiones</strong> y <strong>provincias</strong>:</p>
-<pre class="r"><code>provinciasNew=merge(provincias,regiones,by.x = 'regionUbigeo',
+## 10            67.54610</code></pre>
+<p>… y departamentos (que le hemos llamado regiones):</p>
+<pre class="r"><code>head(regiones)</code></pre>
+<pre><code>##    regionUbigeo regionNombre
+## 4        010000     AMAZONAS
+## 12       020000       ANCASH
+## 33       030000     APURÍMAC
+## 41       040000     AREQUIPA
+## 50       050000     AYACUCHO
+## 62       060000    CAJAMARCA</code></pre>
+<p>Como queremos que el departamento aparezca al costado de su región, sabemos que necesitamos juntar de nuevo ambas subtablas. Esto es algo trivial, <em>si ambas tablas tienen una columna en común</em>: la columna llave (o <em>key</em>).</p>
+<p>La key debemos ponerla en la subtabla mayor, es decir la de provincias. Afortunadamente, del ubigeo de provincia podemos crear el ubigeo de departamento, para asi tener la key en ambas.</p>
+<p>Esto simplemente significa:</p>
+<ol style="list-style-type: decimal">
+<li>Retener los dos primeros digitos del ubigeo de provincia.</li>
+<li>Añadirle ‘0000’ a la cola de lo que acabamos de retener.</li>
+</ol>
+<p>Esto sería así, usando el comando <strong>paste0</strong>:</p>
+<pre class="r"><code>retenidos=substr(provincias$provinciaUbigeo,1,2)
+aLaCola='0000'
+# 'paste0' se encarga de pegar/añadir:
+provincias$regionUbigeo=paste0(retenidos,aLaCola)</code></pre>
+<p>Como ya tenemos una key, podemos juntar ambas subtablas usando el comando <strong>merge</strong>:</p>
+<pre class="r"><code>provinciasNew=merge(provincias,regiones,
+                    by.x = 'regionUbigeo',
                     by.y='regionUbigeo',
                     all.x = TRUE) # Esto detecta si alguna provincia no encontró Region.</code></pre>
-<p>Si el merge salió bien, provincias tendrá una nueva columna (al final) con el nombre de la Región:</p>
+<p><em>provinciasNew</em> es la tabla que integra las anteriores. El comando <strong>merge</strong> lo he escrito de manera super explicita, pues no necesitaba indicar los keys en los argumentos <em>by.x</em> ni <em>by.y</em>: cuando las keys de ambas subtablas llevan el mismo nombre no se necesita. Osea el comando anterior pudo ser:</p>
+<pre class="r"><code>provinciasNew=merge(provincias,regiones,all.x = TRUE) # all.X si lo dejo</code></pre>
+<p>La data está casi lista:</p>
+<pre class="r"><code>head(provinciasNew)</code></pre>
+<pre><code>##   regionUbigeo provinciaUbigeo      provinciaNombre pob2012   ide2012
+## 1       010000          010200                Bagua   77438 0.6622805
+## 2       010000          010300              Bongará   32317 0.6318249
+## 3       010000          010400         Condorcanqui   51802 0.4598242
+## 4       010000          010500                 Luya   52185 0.6047198
+## 5       010000          010600 Rodríguez de Mendoza   30236 0.6312264
+## 6       010000          010700            Utcubamba  118747 0.6096605
+##   identificacion2012 medicos2012 escolaridad2012 AguaDesague2012
+## 1           94.60787   14.609121        79.79018        64.47904
+## 2           97.46807    9.010207        76.42404        54.83408
+## 3           86.23196    8.556959        52.21494        37.71451
+## 4           96.19272   12.418003        74.72597        43.34842
+## 5           97.34310   14.878682        79.42439        46.50182
+## 6           95.17449   10.110167        77.16833        52.51951
+##   electrificacion2012 regionNombre
+## 1            67.91462     AMAZONAS
+## 2            72.16926     AMAZONAS
+## 3            39.48908     AMAZONAS
+## 4            67.39611     AMAZONAS
+## 5            67.54610     AMAZONAS
+## 6            63.11765     AMAZONAS</code></pre>
+<p>Como hemos creado variables y realizado <em>merges</em>, los nombres puede que no figuren en buen orden:</p>
 <pre class="r"><code>names(provinciasNew)</code></pre>
 <pre><code>##  [1] &quot;regionUbigeo&quot;        &quot;provinciaUbigeo&quot;     &quot;provinciaNombre&quot;    
 ##  [4] &quot;pob2012&quot;             &quot;ide2012&quot;             &quot;identificacion2012&quot; 
 ##  [7] &quot;medicos2012&quot;         &quot;escolaridad2012&quot;     &quot;AguaDesague2012&quot;    
 ## [10] &quot;electrificacion2012&quot; &quot;regionNombre&quot;</code></pre>
-<p>Movamos de posición esa columna nueva:</p>
-<pre class="r"><code>provinciasNew=provinciasNew[,c(1:2,11,3:10)]</code></pre>
-<p>Asi quedó:</p>
-<pre class="r"><code>head(provinciasNew)</code></pre>
+<p>Sería mejor reubicar las posiciones:</p>
+<pre class="r"><code># jugando con la posiciones:
+provinciasNew=provinciasNew[,c(1,2,11,3:10)] 
+
+# quedando:
+head(provinciasNew)</code></pre>
 <pre><code>##   regionUbigeo provinciaUbigeo regionNombre      provinciaNombre pob2012
 ## 1       010000          010200     AMAZONAS                Bagua   77438
 ## 2       010000          010300     AMAZONAS              Bongará   32317
