@@ -186,7 +186,7 @@ Lo interesante es que no hay una manera certera de decidir cuántos clusters deb
 library(NbClust)
 
 #usar aqui las variables normalizadas: prov_sub.scaled
-nb <- NbClust(prov_sub.scaled, method = "complete") # 'dist' usa este método por defecto
+nb <- NbClust(prov_sub.scaled, method = "complete") # 'hclust' usa este método por defecto
 
 ```
 

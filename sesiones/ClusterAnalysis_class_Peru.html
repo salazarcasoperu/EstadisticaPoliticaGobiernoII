@@ -238,7 +238,7 @@ rect.hclust(prov_sub_clusters, k = 4, border = 'red',which = 4)</code></pre>
 <pre class="r"><code>library(NbClust)
 
 #usar aqui las variables normalizadas: prov_sub.scaled
-nb &lt;- NbClust(prov_sub.scaled, method = &quot;complete&quot;) # 'dist' usa este método por defecto</code></pre>
+nb &lt;- NbClust(prov_sub.scaled, method = &quot;complete&quot;) # 'hclust' usa este método por defecto</code></pre>
 <p>Del reporte anterior, se ve que la sugerencia depende de la regla de la mayoria: usar TRES clusters. El resultado anterior se puede plotear así:</p>
 <pre class="r"><code>library(factoextra) # toma su tiempo
 fviz_nbclust(nb) + theme_minimal()</code></pre>
