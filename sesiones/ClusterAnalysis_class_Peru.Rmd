@@ -19,7 +19,7 @@ En general, las tablas de datos se estructuran como una colección de filas (cas
 
 La data original del IDE-PNUD está en Excel, lo cual no sería mayor problema, sino fuera por que las _hojas_ tienen varios elementos innecesarios para nuestro análisis. Esta data necesita ser tratada para dejarla lista para el análisis multivariado. Este proceso está descrito más abajo, siga este [link](#cleaning) para revisarlo.
 
-La data preparada para ser analizada podemos encontrarla en el archivo IDE_limpio.xlsx, descarguelo usando el link y guárdelo en la carpeta _data_. Desde ahí comience:
+La data preparada para ser analizada podemos encontrarla en el archivo IDE_limpio.xlsx, descarguelo usando este [link](https://github.com/PoliticayGobiernoPUCP/EstadisticaPoliticaGobiernoII/raw/master/sesiones/data/IDE_limpio.xlsx) y guárdelo en la carpeta _data_. Desde ahí comience:
 
 ```{r, eval=FALSE}
 library(openxlsx)

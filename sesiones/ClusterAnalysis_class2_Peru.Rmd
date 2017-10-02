@@ -10,7 +10,8 @@ ____
 
 <a id='beginning'></a>
 
-Los datos presentes en el archivo Excel:
+Trabajemos con los datos presentes en un archivo Excel (descargar [aqui](https://github.com/PoliticayGobiernoPUCP/EstadisticaPoliticaGobiernoII/raw/master/sesiones/data/idePeru.xlsx)):
+
 ```{r, eval=FALSE}
 library(openxlsx)
 folder='data'

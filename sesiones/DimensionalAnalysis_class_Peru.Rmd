@@ -61,7 +61,7 @@ provMap=ide12[,c(6:10)]
 head(provMap)
 ```
 
-El subconjunto de de arriba está bien, pero necesitamos que haya alguna manera de identificar las provincias. De ahi que mejor reemplazamos los numeros de fila por el ubigeo:
+El subconjunto de arriba está bien, pero necesitamos que haya alguna manera de identificar las provincias. De ahi que mejor reemplazamos los numeros de fila por el ubigeo:
 
 ```{r, eval=FALSE}
 row.names(provMap)=ide12$ubiProv

@@ -137,7 +137,7 @@ $(document).ready(function () {
 <h2>Técnicas Descriptivas y Exploratorias (Parte II)</h2>
 <hr />
 <p><a id="beginning"></a></p>
-<p>Los datos presentes en el archivo Excel:</p>
+<p>Los datos presentes en el archivo Excel (descargar (aqui)[<a href="https://github.com/PoliticayGobiernoPUCP/EstadisticaPoliticaGobiernoII/raw/master/sesiones/data/idePeru.xlsx" class="uri">https://github.com/PoliticayGobiernoPUCP/EstadisticaPoliticaGobiernoII/raw/master/sesiones/data/idePeru.xlsx</a>]):</p>
 <pre class="r"><code>library(openxlsx)
 folder='data'
 fileName='idePeru.xlsx'
@@ -237,14 +237,14 @@ head(df)</code></pre>
 <li><p>Tratar de identificar el numero de clusters que se necesitarán:</p></li>
 </ol>
 <pre class="r"><code>library(NbClust)
-nb &lt;- NbClust(df.scaled1, method = &quot;complete&quot;) # 'method' indica como crear distancias.</code></pre>
+nb &lt;- NbClust(df1.scaled, method = &quot;complete&quot;) # 'method' indica como crear distancias.</code></pre>
 <ol start="5" style="list-style-type: decimal">
 <li>Aplicar el <strong>algoritmo</strong> deseado:</li>
 </ol>
 <pre class="r"><code>library(factoextra)
 algoritmo=&quot;hclust&quot;
 cuantosClusters=3
-solucionJerarquica1 &lt;- eclust(df.scaled1, 
+solucionJerarquica1 &lt;- eclust(df1.scaled, 
                               FUNcluster =algoritmo,
                               k = cuantosClusters,
                               method = &quot;complete&quot;, # como en nb!
@@ -275,7 +275,7 @@ df.scaled2 = scale(df,center=medians,scale=mads)</code></pre>
 </ol>
 <pre class="r"><code>algoritmo=&quot;kmeans&quot;
 cuantosClusters=3
-solucionKmeans1 &lt;- eclust(df.scaled1, 
+solucionKmeans1 &lt;- eclust(df1.scaled, 
                               FUNcluster =algoritmo,
                               k = cuantosClusters, # como en nb!
                               graph = FALSE) 
