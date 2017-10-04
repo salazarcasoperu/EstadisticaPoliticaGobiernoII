@@ -419,10 +419,16 @@ resultadoPr=principal(Poly_cor,3,rotate="varimax", scores=T)
 print(resultadoPr,digits=3,cut = 0.4)
 ```
 
+```{r, echo=F, eval=FALSE}
+varCum=round(resultadoPr$Vaccounted[3,3],3)
+```
+
+Una información adicional se encuentra en la fila **Cummulative Var**, lo que nos interesa es el último valor de esa fila (0.452). Es decir, al elegir 3 latentes para representar a 24 variables, se ha podido recuperar el 45.2% de la variabilidad que las 24 representaban, o dicho de otra manera, las latentes pierden más del 50% de la varianza total. Claro, para que se llegue al 100%, necesitaríamos 24 variables latentes, lo cual nos dejaría como al principio.
 
 ```{r, echo=FALSE, eval=FALSE}
 regresFactors=factor.scores(subTable,resultadoPr)$scores
 ```
+
 
 
 

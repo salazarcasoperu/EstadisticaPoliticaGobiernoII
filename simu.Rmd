@@ -3,35 +3,56 @@ Simulacro
 Abrir archivo:
 
 ```{r}
-library(haven)
-fileToRead="https://github.com/PoliticayGobiernoPUCP/EstadisticaPoliticaGobiernoII/raw/master/sesiones/data/PeruLAPOP2014.sav"
-dataSpss=read_sav(fileToRead)
+library(openxlsx)
+fileToRead="https://github.com/PoliticayGobiernoPUCP/EstadisticaPoliticaGobiernoII/raw/master/sesiones/data/IDE_limpio.xlsx"
+ide=read.xlsx(fileToRead)
 ```
 
-Seleccionar variables:
+Exploración inicial:
 ```{r, eval=FALSE}
-labelsCol1=c('n9','n11','n15')
-labelsCol2=c('pr3a','pr3b','pr3c','pr4')
-
-set1=c(56:73)
-set2=which(names(dataSpss)%in%labelsCol1)
-set3=which(names(dataSpss)%in%labelsCol2)
-#
-columnasQueNecesito=c(set1,set2 ,set3)
-sub_dataSpss=dataSpss[,columnasQueNecesito]
+summary(ide)
 ```
 
-Eliminar Columna innecesaria (*b33*):
+
+Imputando valores perdidos?
 ```{r, eval=FALSE}
-# cual es la columna?
-bye=which(names(sub_dataSpss)%in%'b33')
-sub_dataSpss=sub_dataSpss[,-bye]
-subTable=data.frame(sub_dataSpss)
-# ver:
-head(sub_dataSpss)
+for(i in 5:ncol(ide[])){  
+  MEDIA=mean(ide[,i], na.rm = TRUE) 
+  lapop[is.na(ide[,i]), i] <- round(MEDIA,0)
+}
 ```
 
+Cuantos clusters puedo crear?
 ```{r}
-write_sav(sub_dataSpss,'subLapop.sav')
+ideS=scale(ide[,-c(1:6)])
+row.names(ideS)=ide$provinciaNombre
+
+library(NbClust)
+nb <- NbClust(ideS, method = "complete")
+```
+
+Si agrupo como me recomiendan, cuantas provincias no se agruparían bien bajo un esquema jerarquico?
+```{r}
+library(factoextra)
+algoritmo="hclust"
+cuantosClusters=length(table(nb$Best.partition))
+resultadoJ <- eclust(ideS,FUNcluster =algoritmo,
+                     k = cuantosClusters,
+                     method = "complete",
+                     graph = FALSE) 
+siluetas=resultadoJ$silinfo$widths
+BadCluster=siluetas[siluetas$sil_width<0,]
+nrow(BadCluster)
+```
+
+Tendremos 3 variables latentes entre todas las observadas?
+```{r}
+observadas=ide[,-c(1:6)]
+matriz=cor(observadas)
+library(psych)
+KMO(matriz)
+cortest.bartlett(matriz, n=nrow(ide))
+resultadoPr=principal(matriz,3,rotate="varimax", scores=T)
+print(resultadoPr,digits=3,cut = 0.4)
 ```
 

@@ -200,7 +200,7 @@ head(provMap)</code></pre>
 ## 4   86.2320  8.5570   52.2149     37.7145         39.4891
 ## 5   96.1927 12.4180   74.7260     43.3484         67.3961
 ## 6   97.3431 14.8787   79.4244     46.5018         67.5461</code></pre>
-<p>El subconjunto de de arriba está bien, pero necesitamos que haya alguna manera de identificar las provincias. De ahi que mejor reemplazamos los numeros de fila por el ubigeo:</p>
+<p>El subconjunto de arriba está bien, pero necesitamos que haya alguna manera de identificar las provincias. De ahi que mejor reemplazamos los numeros de fila por el ubigeo:</p>
 <pre class="r"><code>row.names(provMap)=ide12$ubiProv
 
 #viendo:
@@ -391,7 +391,7 @@ prop.table(tablaTE)</code></pre>
 ##  replicates)
 ## 
 ## data:  tablaTE
-## X-squared = 18.042, df = NA, p-value = 0.02599</code></pre>
+## X-squared = 18.042, df = NA, p-value = 0.02749</code></pre>
 <p>Si el valor del <strong>p-value</strong> es menor a <strong>0.05</strong>, se asume que hay asociación (formalmente estamos rechanzando la hipotesis nula: “la variables son independientes”).</p>
 <p>Hasta aqui sabemos que las variables están relacionadas, pero no tenemos mayor detalle de cómo es esa relación. Es aquí donde aparece el <strong>análisis de correspondencias</strong>. Éste es un análisis gráfico que permite conocer como se están asociando las categorías.</p>
 <p>Se comienza por calcular la tabla de correspondencias, a partir de la tabla de contingencia:</p>
@@ -771,6 +771,7 @@ print(resultadoPr,digits=3,cut = 0.4)</code></pre>
 ## The root mean square of the residuals (RMSR) is  0.062 
 ## 
 ## Fit based upon off diagonal values = 0.955</code></pre>
+<p>Una información adicional se encuentra en la fila <strong>Cummulative Var</strong>, lo que nos interesa es el último valor de esa fila 0.452. Es decir, al elegir 3 latentes para representar a 24 variables, se ha podido recuperar el 45.2% de la variabilidad que las 24 representaban, o dicho de otra manera, las latentes pierden más del 50% de la varianza total. Claro, para que se llegue al 100%, necesitaríamos 24 variables latentes, lo cual nos dejaría como al principio.</p>
 <p><a href="#beginning">Inicio</a></p>
 <hr />
 <p><br /></p>
