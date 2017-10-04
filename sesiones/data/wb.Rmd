@@ -1,0 +1,172 @@
+Test
+
+```{r}
+library(openxlsx)
+datafile='mundo.xlsx'
+datat=read.xlsx(datafile)
+head(datat)
+```
+
+
+```{r}
+str(datat)
+```
+
+
+```{r}
+datat=reshape(data, idvar=c('codigopais','pais'),
+        timevar = 'indicador',
+        direction = 'wide')
+```
+
+```{r}
+names(datat)=gsub("valor.", "", names(datat))
+```
+
+```{r}
+datat
+```
+
+Previos:
+Si tuviera que prescindir de alguna de estas variables, Cuál sería la candidata más evidente pues complicaría en análisis estadístico?
+```{r}
+summary(datat)
+```
+
+
+En cuántos grupos de países se podría organizar esta data usando la data original entregada? 
+```{r}
+test=scale(datat[,-c(1,2)])
+library(NbClust)
+nb <- NbClust(test, method = "complete")
+```
+
+En cuántos grupos de países se podría organizar esta data si cada valor perdido fuera reemplazado por la media de esa columna?
+```{r}
+datasc=as.data.frame(lapply(datat[,-c(1,2)],function(x){replace(x,is.na(x),mean(x,na.rm = T))}))
+test2=scale(datasc)
+library(NbClust)
+nb <- NbClust(test2, method = "complete")
+
+
+```
+
+3. Si a toda la data del archivo le llamamos MUNDO, qué código replicaría este gráfico?
+
+```{r}
+library(openxlsx)
+datafile='mundo.xlsx'
+MUNDO=read.xlsx(datafile)
+row.names(MUNDO)=MUNDO$pais
+MUNDO=MUNDO[,-c(1,2)]
+MUNDO_s=scale(MUNDO)
+MUNDO_d=dist(MUNDO_s)
+MUNDO_r=cmdscale(MUNDO_d,eig=TRUE, k=2) 
+x=MUNDO_r$points[,1]
+y=MUNDO_r$points[,2]
+columnForLabels=row.names(MUNDO)
+colorForLabels=as.factor(ifelse(MUNDO$polStabNoTerror>0,'si','no'))
+paleta=c('red','green')
+plot(x, y, main="Mi Grafico",type='n')
+text(x, y,labels = columnForLabels, cex = 0.5,col = paleta[colorForLabels])
+legend("bottomright", legend = levels(colorForLabels),fill = paleta,title = "terror positivo?",cex=0.5)
+```
+
+
+```{r}
+library(openxlsx)
+datafile='mundo'
+MUNDO=read.xlsx(datafile)
+row.names(MUNDO)=MUNDO$pais
+MUNDO=MUNDO[,-c(1,2)]
+MUNDO_s=scale(MUNDO)
+MUNDO_d=dist(MUNDO_s)
+MUNDO_r=cmdscale(MUNDO_d,eig=TRUE, k=2) 
+x=MUNDO_r$points[,1]
+y=MUNDO_r$points[,2]
+columnForLabels=row.names(MUNDO)
+colorForLabels=as.factor(ifelse(MUNDO$polStabNoTerror>0,'si','no'))
+paleta=c('red','green')
+plot(x, y, main="Mi Grafico",type='n')
+text(x, y,labels = columnForLabels, cex = 0.5,col = paleta[colorForLabels])
+legend("bottomright", legend = levels(colorForLabels),fill = paleta,title = "terror positivo?",cex=0.5)
+```
+
+```{r}
+
+library(openxlsx)
+datafile='mundo.xlsx'
+MUNDO=read.xlsx(datafile)
+row.names(MUNDO)=MUNDO$pais
+MUNDO_s=scale(MUNDO)
+MUNDO_d=dist(MUNDO_s)
+MUNDO_r=cmdscale(MUNDO_d,eig=TRUE, k=2) 
+x=MUNDO_r$points[,1]
+y=MUNDO_r$points[,2]
+columnForLabels=row.names(MUNDO)
+colorForLabels=as.factor(ifelse(MUNDO$polStabNoTerror>0,'si','no'))
+paleta=c('red','green')
+plot(x, y, main="Mi Grafico",type='n')
+text(x, y,labels = columnForLabels, cex = 0.5,col = paleta[colorForLabels])
+legend("bottomright", legend = levels(colorForLabels),fill = paleta,title = "terror positivo?",cex=0.5)
+```
+
+
+
+```{r}
+library(openxlsx)
+datafile='mundo.xlsx'
+MUNDO=read.xlsx(datafile)
+subTable=MUNDO[,-c(1,2)]
+
+for(i in 1:ncol(subTable)){  # para cada columna:
+  MEDIANA=median(subTable[,i], na.rm = TRUE) # calcula la mediana de esa columna
+  subTable[is.na(subTable[,i]), i] <- round(MEDIANA,0) # pon la mediana donde haya un NA en esa columna (redondeada)
+}
+library(psych)
+Poly_cor <- cor(subTable)
+KMO(Poly_cor)
+```
+
+```{r}
+cortest.bartlett(Poly_cor, n=nrow(subTable))
+```
+```{r}
+resultadoPr=principal(Poly_cor,2,rotate="varimax", scores=T)
+print(resultadoPr,digits=3,cut = 0.4)
+```
+
+```{r}
+library(openxlsx)
+datafile='mundo.xlsx'
+datat=read.xlsx(datafile)
+etiquetas1=c('bajo','medio','alto')
+datat$mujerFuerzaLO=cut(datat$mujerFuerzaL,
+                           breaks=3,
+                           labels=etiquetas1,
+                           ordered_result = T)
+
+etiquetas2=c('malo','regular','bueno')
+datat$polStabNoTerrorO =cut(datat$polStabNoTerror,
+                           breaks=3,
+                           labels=etiquetas2,
+                           ordered_result = T)
+```
+
+```{r}
+summary(datat)
+```
+
+```{r}
+tablaTE=table(datat$mujerFuerzaLO,datat$polStabNoTerrorO)
+```
+```{r}
+chisq.test(tablaTE,simulate.p.value = T)
+```
+
+```{r}
+library(ca)
+tablaCA_te=ca(tablaTE)
+plot.ca(tablaCA_te, col=c("red","blue"))
+```
+

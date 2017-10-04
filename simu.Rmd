@@ -1,0 +1,37 @@
+Simulacro
+
+Abrir archivo:
+
+```{r}
+library(haven)
+fileToRead="https://github.com/PoliticayGobiernoPUCP/EstadisticaPoliticaGobiernoII/raw/master/sesiones/data/PeruLAPOP2014.sav"
+dataSpss=read_sav(fileToRead)
+```
+
+Seleccionar variables:
+```{r, eval=FALSE}
+labelsCol1=c('n9','n11','n15')
+labelsCol2=c('pr3a','pr3b','pr3c','pr4')
+
+set1=c(56:73)
+set2=which(names(dataSpss)%in%labelsCol1)
+set3=which(names(dataSpss)%in%labelsCol2)
+#
+columnasQueNecesito=c(set1,set2 ,set3)
+sub_dataSpss=dataSpss[,columnasQueNecesito]
+```
+
+Eliminar Columna innecesaria (*b33*):
+```{r, eval=FALSE}
+# cual es la columna?
+bye=which(names(sub_dataSpss)%in%'b33')
+sub_dataSpss=sub_dataSpss[,-bye]
+subTable=data.frame(sub_dataSpss)
+# ver:
+head(sub_dataSpss)
+```
+
+```{r}
+write_sav(sub_dataSpss,'subLapop.sav')
+```
+
